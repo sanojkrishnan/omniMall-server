@@ -1,22 +1,27 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const config = require("config");
 const http = require("http");
-const logger = require("logger");
-const { PORT } = require("./config/config");
+const logger = require("./utils/logger");
+const { setupMiddleware } = require("./middleware/setup");
+const { setupRoutes } = require("./routes");
+const { initializeSocket } = require("./utils/socket");
+const { runSeeders } = require("./utils/seeder");
+const config = require("./config/config");
+const { errorHandler, notFound } = require("./middleware/errorHandler");
+const DBConnect = require("./config/database");
 
 class Server {
   constructor() {
     this.app = express();
-    this.server = HTMLOutputElement.createServer(this.app); // HTTP server wrapping Express because we are using socket io
-    this.port = PORT;
+    this.server = http.createServer(this.app); // HTTP server wrapping Express because we are using socket io
+    this.port = config.PORT;
   }
 
   // this makes all the connections for db middleware routes etc
   async initialize() {
     try {
       await DBConnect.connect(); // mongodb connection. DBconnect
-      setUpMiddleware(this.app); // setting middlewares (cors and others)
+      setupMiddleware(this.app); // setting middlewares (cors and others)
       setupRoutes(this.app); //calling all routes
       this.app.use(notFound); //if anu unknown rout is came
       this.app.use(errorHandler); //error handle
