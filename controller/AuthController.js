@@ -1,5 +1,10 @@
-const register = async (req, res) => {
-  try {
+const AuthService = require("../services/authService");
+const { registerValidation } = require("../utils/validation");
+const BaseController = require("./BaseController");
+
+class AuthController extends BaseController {
+  //register controller
+  static register = BaseController.asyncHandler(async (req, res) => {
     const userData = {
       firstName: req.body.firstName,
       lastName: req.body.lastName,
@@ -17,17 +22,19 @@ const register = async (req, res) => {
         publicId: req.file.filename,
       };
     }
+    const validatedData = BaseController.validateRequest(
+      registerValidation,
+      userData,
+    );
+    const result = await AuthService.register(validatedData);
+    BaseController.logAction("USER_REGISTER", result.user);
+    BaseController.sendSuccess(
+      res,
+      "User registered successfully. Welcome!",
+      result,
+      201,
+    );
+  });
+}
 
-    const user = new User(userData);
-    await user.save();
-
-    res.status(201).json({
-      message: "User registered successfully",
-      user: user.getPublicProfile(),
-    });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Registration failed", error: error.message });
-  }
-};
+module.exports = AuthController;

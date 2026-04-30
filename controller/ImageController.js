@@ -50,3 +50,8 @@ const deleteProfileImage = async (req, res) => {
     res.status(500).json({ message: "Delete failed", error: error.message });
   }
 };
+
+module.exports = {
+  uploadProfileImage,
+  deleteProfileImage,
+};
