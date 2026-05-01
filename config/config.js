@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 module.exports = {
   PORT: process.env.PORT || 5000,
 
@@ -18,8 +20,8 @@ module.exports = {
     AUTH_MAX_REQUESTS: 5,
   },
   //admin seed
-  ADMIN_PASS: process.env.ADMIN_PASSWORD || "admin123@admin.com",
-  ADMIN_EMAIL: process.env.ADMIN_EMAIL || "admin123",
+  ADMIN_PASS: process.env.ADMIN_PASSWORD || "admin123",
+  ADMIN_EMAIL: process.env.ADMIN_EMAIL || "admin123@omnimall.com",
 
   //jwt
   JWT_SECRET: {

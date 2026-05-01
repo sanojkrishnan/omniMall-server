@@ -1,6 +1,3 @@
-const logger = require("./logger");
-
-
 const { ErrorUtils } = require('./errors');
 
 class ResponseFormatter {
@@ -37,7 +34,7 @@ class ResponseFormatter {
   }
 
   static validationError(res, validationResult) {
-    const errors = validationResult.error.details.map(detail => ({
+    const errors = validationResult.details.map(detail => ({
       field: detail.path[0],
       message: detail.message,
       value: detail.context?.value

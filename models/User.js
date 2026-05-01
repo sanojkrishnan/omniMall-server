@@ -5,14 +5,24 @@ const userSchema = new mongoose.Schema(
   {
     firstName: {
       type: String,
-      required: [true, "First name is required"],
+      required: [
+        function () {
+          return this.role !== "admin";
+        },
+        "First name is required",
+      ],
       trim: true,
       minlength: [3, "Name must be at least 3 characters long"],
       maxlength: [15, "Name cannot exceed 15 characters"],
     },
     lastName: {
       type: String,
-      required: [true, "Last name is required"],
+      required: [
+        function () {
+          return this.role !== "admin";
+        },
+        "Last name is required",
+      ],
       trim: true,
       minlength: [1, "Name must be at least 1 characters long"],
       maxlength: [15, "Name cannot exceed 15 characters"],
@@ -35,16 +45,26 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["user", "seller"],
+      enum: ["user", "seller", "admin"],
       default: "user",
     },
     dateOfBirth: {
       type: Date,
-      required: [true, "Date of birth is not provided"],
+      required: [
+        function () {
+          return this.role !== "admin";
+        },
+        "Date of birth is not provided",
+      ],
     },
     gender: {
       type: String,
-      required: [true, "Gender is not provided"],
+      required: [
+        function () {
+          return this.role !== "admin";
+        },
+        "Gender is not provided",
+      ],
       enum: ["male", "female"],
     },
     status: {
@@ -82,16 +102,9 @@ const userSchema = new mongoose.Schema(
   },
 );
 
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
-
-  try {
-    const hashedPassword = await bcrypt.hash(this.password, 12);
-    this.password = hashedPassword;
-    next();
-  } catch (error) {
-    next(error);
-  }
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
+  this.password = await bcrypt.hash(this.password, 12);
 });
 
 userSchema.methods.comparePassword = async function (candidatePassword) {

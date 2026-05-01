@@ -30,7 +30,7 @@ class BaseController {
   }
 
   static handleValidationError(res, error) {
-    return sendValidationError(res, { error });
+    return sendValidationError(res,  error);
   }
 
   static sendSuccess(res, message, data = null, statusCode = 200) {

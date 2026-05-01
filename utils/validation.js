@@ -9,9 +9,8 @@ const commonPatterns = {
   dateOfBirth: Joi.date().required(),
   gender: Joi.string().valid("male", "female", "other").required(),
   status: Joi.string().valid("active", "banned", "inactive"),
-  role: Joi.string().valid("user", "seller").default("user"),
+  role: Joi.string().valid("user", "seller", "admin").default("user"),
 };
-
 const customMessages = {
   "string.min": "{#label} must be at least {#limit} characters long",
   "string.max": "{#label} cannot exceed {#limit} characters",
@@ -41,6 +40,19 @@ const registerValidation = Joi.object({
   gender: commonPatterns.gender.messages(customMessages),
 });
 
+const loginValidation = Joi.object({
+  email: commonPatterns.email.messages(customMessages),
+  password: Joi.string().required().messages(customMessages),
+});
+
+const adminCreateValidation = Joi.object({
+  name: Joi.string().min(2).max(100).trim().required(),
+  email: commonPatterns.email.messages(customMessages),
+  password: strongPasswordValidation,
+});
+
+const adminLoginValidation = loginValidation;
+
 const ValidationHelpers = {
   validatePagination: (query) => {
     const { error, value } = paginationValidation.validate(query);
@@ -68,4 +80,7 @@ module.exports = {
   commonPatterns,
   customMessages,
   strongPasswordValidation,
+  adminLoginValidation,
+  loginValidation,
+  adminCreateValidation,
 };

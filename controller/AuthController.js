@@ -1,5 +1,5 @@
 const AuthService = require("../services/authService");
-const { registerValidation } = require("../utils/validation");
+const { registerValidation, loginValidation } = require("../utils/validation");
 const BaseController = require("./BaseController");
 
 class AuthController extends BaseController {
@@ -28,11 +28,21 @@ class AuthController extends BaseController {
     );
     const result = await AuthService.register(validatedData);
     BaseController.logAction("USER_REGISTER", result.user);
+
     BaseController.sendSuccess(
       res,
       "User registered successfully. Welcome!",
       result,
       201,
+    );
+  });
+
+  //login controller
+  static login = BaseController.asyncHandler(async (req, res) => {
+    const loginData = req.body;
+    const validateData = BaseController.validateRequest(
+      loginValidation,
+      loginData,
     );
   });
 }

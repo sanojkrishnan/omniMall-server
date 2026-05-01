@@ -4,7 +4,7 @@ const logger = require("../utils/logger");
 
 const seedAdmin = async () => {
   try {
-    const adminEmail = config.ADMIN_EMAIL || "admin123@admin.com";
+    const adminEmail = config.ADMIN_EMAIL || "admin123@omnimall.com";
     const existingAdmin = await User.findByEmail(adminEmail);
 
     if (!existingAdmin) {
@@ -36,24 +36,33 @@ const seedSampleUsers = async () => {
 
     const sampleUsers = [
       {
-        name: "John Doe",
+        firstName: "John",
+        lastName: "Doe",
         email: "john@example.com",
         password: "password123",
         role: "user",
+        gender: "male",
+        dateOfBirth: new Date("1990-01-01"),
         status: "active",
       },
       {
-        name: "Jane Smith",
+        firstName: "Jane",
+        lastName: "Smith",
         email: "jane@example.com",
         password: "password123",
-        role: "user",
+        role: "seller",
+        gender: "female",
+        dateOfBirth: new Date("1992-05-15"),
         status: "active",
       },
       {
-        name: "Bob Johnson",
+        firstName: "Bob",
+        lastName: "Johnson",
         email: "bob@example.com",
         password: "password123",
         role: "seller",
+        gender: "male",
+        dateOfBirth: new Date("1990-01-01"),
         status: "banned",
       },
     ];
