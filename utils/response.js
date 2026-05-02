@@ -1,4 +1,4 @@
-const { ErrorUtils } = require('./errors');
+const { ErrorUtils } = require("./errors");
 
 class ResponseFormatter {
   static success(res, message, data = null, statusCode = 200, meta = null) {
@@ -6,7 +6,7 @@ class ResponseFormatter {
       success: true,
       message,
       timestamp: new Date().toISOString(),
-      requestId: res.locals.requestId || null
+      requestId: res.locals.requestId || null,
     };
 
     if (data !== null) {
@@ -27,29 +27,29 @@ class ResponseFormatter {
     const response = {
       ...formattedError,
       timestamp: new Date().toISOString(),
-      requestId: res.locals.requestId || null
+      requestId: res.locals.requestId || null,
     };
 
     return res.status(finalStatusCode).json(response);
   }
 
   static validationError(res, validationResult) {
-    const errors = validationResult.details.map(detail => ({
+    const errors = validationResult.details.map((detail) => ({
       field: detail.path[0],
       message: detail.message,
-      value: detail.context?.value
+      value: detail.context?.value,
     }));
 
     const response = {
       success: false,
       error: {
-        message: 'Validation failed',
-        code: 'VALIDATION_ERROR',
+        message: "Validation failed",
+        code: "VALIDATION_ERROR",
         statusCode: 400,
-        details: errors
+        details: errors,
       },
       timestamp: new Date().toISOString(),
-      requestId: res.locals.requestId || null
+      requestId: res.locals.requestId || null,
     };
 
     return res.status(400).json(response);
@@ -63,23 +63,24 @@ class ResponseFormatter {
         totalItems: pagination.totalItems || pagination.totalUsers,
         itemsPerPage: pagination.limit,
         hasNextPage: pagination.hasNextPage,
-        hasPrevPage: pagination.hasPrevPage
-      }
+        hasPrevPage: pagination.hasPrevPage,
+      },
     });
   }
 
   static file(res, filePath, filename = null, options = {}) {
     const downloadOptions = {
-      dotfiles: 'deny',
+      dotfiles: "deny",
       headers: {
-        'x-timestamp': Date.now(),
-        'x-sent': true
+        "x-timestamp": Date.now(),
+        "x-sent": true,
       },
-      ...options
+      ...options,
     };
 
     if (filename) {
-      downloadOptions.headers['content-disposition'] = `attachment; filename="${filename}"`;
+      downloadOptions.headers["content-disposition"] =
+        `attachment; filename="${filename}"`;
     }
 
     return res.download(filePath, filename, downloadOptions, (err) => {
@@ -101,46 +102,46 @@ class ResponseFormatter {
     return res.status(204).send();
   }
 
-  static notFound(res, message = 'Resource not found') {
+  static notFound(res, message = "Resource not found") {
     const response = {
       success: false,
       error: {
         message,
-        code: 'NOT_FOUND',
-        statusCode: 404
+        code: "NOT_FOUND",
+        statusCode: 404,
       },
       timestamp: new Date().toISOString(),
-      requestId: res.locals.requestId || null
+      requestId: res.locals.requestId || null,
     };
 
     return res.status(404).json(response);
   }
 
-  static unauthorized(res, message = 'Authentication required') {
+  static unauthorized(res, message = "Authentication required") {
     const response = {
       success: false,
       error: {
         message,
-        code: 'UNAUTHORIZED',
-        statusCode: 401
+        code: "UNAUTHORIZED",
+        statusCode: 401,
       },
       timestamp: new Date().toISOString(),
-      requestId: res.locals.requestId || null
+      requestId: res.locals.requestId || null,
     };
 
     return res.status(401).json(response);
   }
 
-  static forbidden(res, message = 'Access denied') {
+  static forbidden(res, message = "Access denied") {
     const response = {
       success: false,
       error: {
         message,
-        code: 'FORBIDDEN',
-        statusCode: 403
+        code: "FORBIDDEN",
+        statusCode: 403,
       },
       timestamp: new Date().toISOString(),
-      requestId: res.locals.requestId || null
+      requestId: res.locals.requestId || null,
     };
 
     return res.status(403).json(response);
@@ -166,5 +167,5 @@ module.exports = {
   ResponseFormatter,
   sendSuccess,
   sendError,
-  sendValidationError
+  sendValidationError,
 };

@@ -29,7 +29,7 @@ const strongPasswordValidation = Joi.string()
     "string.pattern.base":
       "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
   });
-
+//registration validation schema
 const registerValidation = Joi.object({
   firstName: commonPatterns.firstName.messages(customMessages),
   lastName: commonPatterns.lastName.messages(customMessages),
@@ -39,20 +39,27 @@ const registerValidation = Joi.object({
   dateOfBirth: commonPatterns.dateOfBirth.messages(customMessages),
   gender: commonPatterns.gender.messages(customMessages),
 });
-
+//otp validation schema
+const otpValidation = Joi.object({
+  email: commonPatterns.email.messages(customMessages),
+  otp: Joi.string().length(6).required().messages(customMessages),
+});
+//login validation schema
 const loginValidation = Joi.object({
   email: commonPatterns.email.messages(customMessages),
   password: Joi.string().required().messages(customMessages),
 });
 
+
+//admin create validation schema
 const adminCreateValidation = Joi.object({
   name: Joi.string().min(2).max(100).trim().required(),
   email: commonPatterns.email.messages(customMessages),
   password: strongPasswordValidation,
 });
-
+//admin login validation 
 const adminLoginValidation = loginValidation;
-
+//pagination validation schema
 const ValidationHelpers = {
   validatePagination: (query) => {
     const { error, value } = paginationValidation.validate(query);
@@ -83,4 +90,5 @@ module.exports = {
   adminLoginValidation,
   loginValidation,
   adminCreateValidation,
+  otpValidation,
 };

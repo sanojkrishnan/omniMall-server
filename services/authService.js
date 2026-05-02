@@ -1,4 +1,6 @@
 const User = require("../models/User");
+const OTP = require("../models/OTP");
+const bcrypt = require("bcrypt");
 const { generateUserToken } = require("../utils/jwt");
 const logger = require("../utils/logger");
 const {
@@ -6,35 +8,96 @@ const {
   ConflictError,
   NotFoundError,
 } = require("../utils/errors");
+const { sendOTPEmail } = require("../utils/nodemailer");
+const generateOTP = require("../utils/generateOtp");
 
 class AuthService {
-
-    //registration
+  //registration
   static async register(userData) {
     try {
-
-        //if the email already exists 
+      // 1. check if email already exists
       const existingUser = await User.findByEmail(userData.email);
       if (existingUser) {
         throw new ConflictError("User with this email already exists");
-      } //else save data
-      const user = new User(userData);
+      }
+
+      // 2. delete any old OTP for this email
+      await OTP.deleteMany({ email: userData.email });
+
+      // 3. generate OTP and save it with userData inside
+      const otp = generateOTP();
+      await OTP.create({
+        email: userData.email,
+        otp: otp,
+        expiresAt: new Date(Date.now() + 5 * 60 * 1000),
+        userData: userData, // ← store user data temporarily
+      });
+
+      // 4. send OTP email
+      await sendOTPEmail(userData.email, otp);
+
+      logger.info(`OTP sent to: ${userData.email}`);
+
+      // 5. don't create user or token yet
+      return {
+        message:
+          "OTP sent to your email. Please verify to complete registration.",
+      };
+    } catch (error) {
+      logger.error("Registration error:", error);
+      throw error;
+    }
+  }
+
+  static async verifyOTP({ email, otp }) {
+    try {
+      // 1. find otp record
+      const record = await OTP.findOne({ email });
+      if (!record) {
+        throw new AuthenticationError(
+          "OTP not found. Please request a new one.",
+        );
+      }
+
+      // 2. check if expired
+      if (new Date() > record.expiresAt) {
+        await OTP.deleteOne({ email });
+        throw new AuthenticationError(
+          "OTP has expired. Please request a new one.",
+        );
+      }
+
+      // 3. check if otp matches
+      const isMatch = await bcrypt.compare(otp, record.otp);
+      if (!isMatch) {
+        throw new AuthenticationError("Invalid OTP. Please try again.");
+      }
+
+      // 4. delete OTP — it's used now
+      await OTP.deleteOne({ email });
+
+      // 5. create the user using stored userData
+      const user = new User({
+        ...record.userData, //  use the data saved during register
+        isVerified: true, //  mark as verified immediately
+      });
       await user.save();
-      //generate user token
+
+      // 6. generate token
       const token = generateUserToken({
         id: user._id,
         email: user.email,
         role: user.role,
       });
 
-      logger.info(`New user registered: ${userData.email}`);
+      logger.info(`User verified and registered: ${email}`);
 
       return {
-        user: user.getPublicProfile(),  //returns only the safe, public fields of a user
+        user: user.getPublicProfile(),
         token,
       };
     } catch (error) {
-      logger.error("Registration error:", error);
+      logger.error("OTP verification error:", error);
       throw error;
     }
   }

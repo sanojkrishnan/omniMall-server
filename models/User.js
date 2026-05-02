@@ -101,26 +101,26 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   },
 );
-
+//hash password using bcrypt before saving to database
 userSchema.pre("save", async function () {
   if (!this.isModified("password")) return;
   this.password = await bcrypt.hash(this.password, 12);
 });
-
+//compare provided password with hashed password in database before allowing login
 userSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
-
+//returns user data without password field for responses
 userSchema.methods.getPublicProfile = function () {
   const userObject = this.toObject();
   delete userObject.password;
   return userObject;
 };
-
+//static method to find all active users
 userSchema.statics.findActiveUsers = function () {
   return this.find({ status: "active" });
 };
-
+//static method to find user by email, used for login and other operations
 userSchema.statics.findByEmail = function (email) {
   return this.findOne({ email: email.toLowerCase() });
 };

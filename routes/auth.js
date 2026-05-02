@@ -4,6 +4,7 @@ const {
   login,
   handleValidationError,
   sanitizeUser,
+  verifyOTP,
 } = require("../controller/AuthController");
 const { upload } = require("../config/cloudinary");
 const {
@@ -16,12 +17,13 @@ const router = express.Router();
 router.post(
   "/register",
   upload.single("profileImage"),
-  handleValidationError,
-  sanitizeUser,
+
   register,
 );
+//otp verification route
+router.post("/verify-otp", verifyOTP);
 //login route
-router.post("/login", handleValidationError, sanitizeUser, login);
+router.post("/login", login);
 //image change
 router.post(
   "/profile/image",

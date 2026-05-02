@@ -43,7 +43,7 @@ const authenticateUser = async (req, res, next) => {
 //seller role check
 const requireSeller = (req, res, next) => {
   if (!req.seller || req.seller.role !== "seller") {
-    return sendError(res, "Admin privileges required", 403);
+    return sendError(res, "Seller privileges required", 403);
   }
   next();
 };

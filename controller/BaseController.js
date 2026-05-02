@@ -15,7 +15,7 @@ class BaseController {
     };
   }
 
-  //   Validates request body against a Joi schema
+  // Validates request body against a Joi schema
   // If invalid, throws a ValidationError with all error messages joined
   // abortEarly: false means it collects all errors, not just the first one
   static validateRequest(schema, data) {
