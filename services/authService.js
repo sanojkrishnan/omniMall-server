@@ -3,12 +3,13 @@ const OTP = require("../models/OTP");
 const bcrypt = require("bcrypt");
 const { generateUserToken } = require("../utils/jwt");
 const logger = require("../utils/logger");
+const crypto = require("crypto");
 const {
   AuthenticationError,
   ConflictError,
   NotFoundError,
 } = require("../utils/errors");
-const { sendOTPEmail } = require("../utils/nodemailer");
+const { sendOTPEmail, sendResetEmail } = require("../utils/nodemailer");
 const generateOTP = require("../utils/generateOtp");
 
 class AuthService {
@@ -223,6 +224,62 @@ class AuthService {
       return user;
     } catch (error) {
       logger.error("User validation error:", error);
+      throw error;
+    }
+  }
+  //forgot password - generate token, save to user, send email with reset link
+  static async forgotPassword(email) {
+    try {
+      const user = await User.findByEmail(email);
+      if (!user) throw new NotFoundError("User not found");
+
+      // generate token
+      const token = crypto.randomBytes(32).toString("hex");
+      const hashedToken = crypto
+        .createHash("sha256")
+        .update(token)
+        .digest("hex");
+
+      // save to user
+      user.resetPasswordToken = hashedToken;
+      user.resetPasswordExpires = Date.now() + 15 * 60 * 1000; // 15 mins
+      await user.save();
+
+      // send email
+      const resetURL = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+      await sendResetEmail(user.email, resetURL);
+
+      return { message: "Password reset link sent to your email" };
+    } catch (error) {
+      logger.error("Forgot password error:", error);
+      throw error;
+    }
+  }
+  //reset password using token
+  static async resetPassword(token, newPassword) {
+    try {
+      const hashedToken = crypto
+        .createHash("sha256")
+        .update(token)
+        .digest("hex");
+
+      const user = await User.findOne({
+        resetPasswordToken: hashedToken,
+        resetPasswordExpires: { $gt: Date.now() }, // not expired
+      });
+
+      if (!user)
+        throw new AuthenticationError("Invalid or expired reset token");
+
+      // update password
+      user.password = newPassword;
+      user.resetPasswordToken = null;
+      user.resetPasswordExpires = null;
+      await user.save();
+
+      return { message: "Password reset successful" };
+    } catch (error) {
+      logger.error("Reset password error:", error);
       throw error;
     }
   }

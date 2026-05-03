@@ -27,6 +27,30 @@ const sendOTPEmail = async (email, otp) => {
   }
 };
 
+//send reset password email
+const sendResetEmail = async (email, resetURL) => {
+  await transporter.sendMail({
+    from: process.env.EMAIL_FROM,
+    to: email,
+    subject: "Password Reset Link",
+    html: `
+      <h2>Password Reset Request</h2>
+      <p>Click the link below to reset your password. This link expires in 15 minutes.</p>
+      <a href="${resetURL}" style="
+        background-color: #000;
+        color: #fff;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 5px;
+        display: inline-block;
+        margin-top: 10px;
+      ">Reset Password</a>
+      <p>If you didn't request this, ignore this email.</p>
+    `,
+  });
+};
+
 module.exports = {
-    sendOTPEmail,
-}
+  sendOTPEmail,
+  sendResetEmail,
+};

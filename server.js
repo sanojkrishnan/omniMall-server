@@ -58,18 +58,27 @@ class Server {
     const graceFullShutdown = async (signal) => {
       logger.info(`${signal} received. Self dying gracefully...(:`);
 
+      this.io?.close(() => {
+        logger.info("Socket.IO closed!");
+      });
+
       this.server.close(async () => {
         logger.info("HTTP server closed!");
 
-        await dbConnection.disconnect();
+        await DBConnect.disconnect();
         logger.info("DB disconnected. Graceful shutdown completed!");
+
+        setTimeout(() => {
+          logger.warn("Forced shutdown after timeout");
+          process.exit(1);
+        }, 5000);
 
         process.exit(0);
         logger.info("Safe and clean exit");
       });
     };
-    process.on("SIGTERM", () => gracefulShutdown("SIGTERM")); //process.on is listening to the OS.. SIGTERM = please stop gracefully
-    process.on("SIGINT", () => gracefulShutdown("SIGINT")); //SIGINT= please stop
+    process.on("SIGTERM", () => graceFullShutdown("SIGTERM")); //process.on is listening to the OS.. SIGTERM = please stop gracefully
+    process.on("SIGINT", () => graceFullShutdown("SIGINT")); //SIGINT= please stop
   }
 }
 const appServer = new Server(); // this will run the Server class's constructor function create the new object as the class do

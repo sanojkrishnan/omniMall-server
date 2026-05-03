@@ -5,6 +5,8 @@ const {
   handleValidationError,
   sanitizeUser,
   verifyOTP,
+  forgotPassword,
+  resetPassword,
 } = require("../controller/AuthController");
 const { upload } = require("../config/cloudinary");
 const {
@@ -32,5 +34,9 @@ router.post(
 );
 //image edit
 router.delete("/profile/image", deleteProfileImage);
+
+// forgot password route
+router.post("/forgot-password", forgotPassword);
+router.post("/reset-password", resetPassword);
 
 module.exports = router;

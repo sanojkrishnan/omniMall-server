@@ -67,6 +67,18 @@ class AuthController extends BaseController {
       200,
     );
   });
+
+  static forgotPassword = BaseController.asyncHandler(async (req, res) => {
+    const { email } = req.body;
+    const result = await AuthService.forgotPassword(email);
+    BaseController.sendSuccess(res, result.message, null, 200);
+  });
+
+  static resetPassword = BaseController.asyncHandler(async (req, res) => {
+    const { token, password } = req.body;
+    const result = await AuthService.resetPassword(token, password);
+    BaseController.sendSuccess(res, result.message, null, 200);
+  });
 }
 
 module.exports = AuthController;
