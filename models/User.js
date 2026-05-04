@@ -99,11 +99,9 @@ const userSchema = new mongoose.Schema(
     // reset password fields for forgot password functionality
     resetPasswordToken: {
       type: String,
-      default: null,
     },
     resetPasswordExpires: {
       type: Date,
-      default: null,
     },
   },
   {

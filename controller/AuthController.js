@@ -3,6 +3,7 @@ const {
   registerValidation,
   loginValidation,
   otpValidation,
+  resetPasswordValidation,
 } = require("../utils/validation");
 const BaseController = require("./BaseController");
 
@@ -67,15 +68,20 @@ class AuthController extends BaseController {
       200,
     );
   });
-
+  // forgot password controller
   static forgotPassword = BaseController.asyncHandler(async (req, res) => {
     const { email } = req.body;
     const result = await AuthService.forgotPassword(email);
     BaseController.sendSuccess(res, result.message, null, 200);
   });
-
+  // reset password controller
+  // 2. add validation to resetPassword controller
   static resetPassword = BaseController.asyncHandler(async (req, res) => {
     const { token, password } = req.body;
+    BaseController.validateRequest(resetPasswordValidation, {
+      token,
+      password,
+    }); // 👈 add this
     const result = await AuthService.resetPassword(token, password);
     BaseController.sendSuccess(res, result.message, null, 200);
   });

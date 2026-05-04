@@ -7,6 +7,10 @@ const commonPatterns = {
   password: Joi.string().min(8).max(128).required(),
   objectId: Joi.string().regex(/^[0-9a-fA-F]{24}$/),
   dateOfBirth: Joi.date().required(),
+  profileImage: Joi.object({
+    url: Joi.string(),
+    publicId: Joi.string(),
+  }).optional(),
   gender: Joi.string().valid("male", "female", "other").required(),
   status: Joi.string().valid("active", "banned", "inactive"),
   role: Joi.string().valid("user", "seller", "admin").default("user"),
@@ -49,7 +53,11 @@ const loginValidation = Joi.object({
   email: commonPatterns.email.messages(customMessages),
   password: Joi.string().required().messages(customMessages),
 });
-
+//reset password validation schema
+const resetPasswordValidation = Joi.object({
+  token: Joi.string().required().messages(customMessages),
+  password: strongPasswordValidation,
+});
 
 //admin create validation schema
 const adminCreateValidation = Joi.object({
@@ -57,7 +65,7 @@ const adminCreateValidation = Joi.object({
   email: commonPatterns.email.messages(customMessages),
   password: strongPasswordValidation,
 });
-//admin login validation 
+//admin login validation
 const adminLoginValidation = loginValidation;
 //pagination validation schema
 const ValidationHelpers = {
@@ -86,6 +94,7 @@ module.exports = {
   ValidationHelpers,
   commonPatterns,
   customMessages,
+  resetPasswordValidation,
   strongPasswordValidation,
   adminLoginValidation,
   loginValidation,

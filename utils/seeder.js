@@ -26,7 +26,6 @@ const seedAdmin = async () => {
   }
 };
 
-
 //sample user seeding only if the app is under development
 const seedSampleUsers = async () => {
   try {

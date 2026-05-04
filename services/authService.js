@@ -228,24 +228,22 @@ class AuthService {
     }
   }
   //forgot password - generate token, save to user, send email with reset link
+  // AuthService.js - replace forgotPassword
   static async forgotPassword(email) {
     try {
       const user = await User.findByEmail(email);
       if (!user) throw new NotFoundError("User not found");
 
-      // generate token
       const token = crypto.randomBytes(32).toString("hex");
       const hashedToken = crypto
         .createHash("sha256")
         .update(token)
         .digest("hex");
 
-      // save to user
       user.resetPasswordToken = hashedToken;
-      user.resetPasswordExpires = Date.now() + 15 * 60 * 1000; // 15 mins
+      user.resetPasswordExpires = new Date(Date.now() + 5 * 60 * 1000); // ✅ new Date()
       await user.save();
 
-      // send email
       const resetURL = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
       await sendResetEmail(user.email, resetURL);
 
@@ -255,7 +253,8 @@ class AuthService {
       throw error;
     }
   }
-  //reset password using token
+
+  // AuthService.js - replace resetPassword
   static async resetPassword(token, newPassword) {
     try {
       const hashedToken = crypto
@@ -263,18 +262,28 @@ class AuthService {
         .update(token)
         .digest("hex");
 
-      const user = await User.findOne({
-        resetPasswordToken: hashedToken,
-        resetPasswordExpires: { $gt: Date.now() }, // not expired
-      });
+      // ✅ find by token only first
+      const user = await User.findOne({ resetPasswordToken: hashedToken });
+      if (!user) throw new AuthenticationError("Invalid reset token");
 
-      if (!user)
-        throw new AuthenticationError("Invalid or expired reset token");
+      console.log("Expires at:", user.resetPasswordExpires);
+      console.log("Now:", new Date());
+      console.log("Is expired:", user.resetPasswordExpires < Date.now());
 
-      // update password
+      // ✅ check expiry separately
+      if (user.resetPasswordExpires < Date.now()) {
+        user.resetPasswordToken = undefined; // ✅ undefined not null
+        user.resetPasswordExpires = undefined;
+        await user.save();
+        throw new AuthenticationError(
+          "Reset link has expired. Please request a new one.",
+        );
+      }
+
+      // ✅ valid — reset password
       user.password = newPassword;
-      user.resetPasswordToken = null;
-      user.resetPasswordExpires = null;
+      user.resetPasswordToken = undefined; // ✅ undefined not null
+      user.resetPasswordExpires = undefined;
       await user.save();
 
       return { message: "Password reset successful" };
