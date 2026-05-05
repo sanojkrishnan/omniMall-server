@@ -1,0 +1,16 @@
+{
+    "signal": "SIGINT",
+    "watch": [
+        "*.js",
+        "routes",
+        "controllers",
+        "services",
+        "utils",
+        "config",
+        "middleware"
+    ],
+    "ignore": [
+        "node_modules",
+        "logs"
+    ]
+}

@@ -58,24 +58,34 @@ class Server {
     const graceFullShutdown = async (signal) => {
       logger.info(`${signal} received. Self dying gracefully...(:`);
 
-      this.io?.close(() => {
-        logger.info("Socket.IO closed!");
-      });
+      // close socket.io first
+      if (this.io) {
+        this.io.close(() => {
+          logger.info("Socket.IO closed!");
+        });
+      }
 
+      // force close all keep-alive connections
+      this.server.closeAllConnections(); // this is the key fix
+
+      //  now server.close() will actually fire
       this.server.close(async () => {
         logger.info("HTTP server closed!");
 
         await DBConnect.disconnect();
         logger.info("DB disconnected. Graceful shutdown completed!");
-
-        setTimeout(() => {
-          logger.warn("Forced shutdown after timeout");
-          process.exit(1);
-        }, 5000);
+        logger.info("Safe and clean exit");
 
         process.exit(0);
-        logger.info("Safe and clean exit");
       });
+
+      // forced exit fallback if something hangs
+      const forceExit = setTimeout(() => {
+        logger.warn("Forced shutdown after timeout");
+        process.exit(1);
+      }, 5000);
+
+      forceExit.unref();
     };
     process.on("SIGTERM", () => graceFullShutdown("SIGTERM")); //process.on is listening to the OS.. SIGTERM = please stop gracefully
     process.on("SIGINT", () => graceFullShutdown("SIGINT")); //SIGINT= please stop
