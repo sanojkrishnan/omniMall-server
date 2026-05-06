@@ -1,4 +1,4 @@
-const { Server } = require("socket.io"); //Unlike regular HTTP (request → response → done), Socket.IO keeps a persistent connection open so the server can push messages to clients instantly without the client asking.
+const { Server } = require("socket.io"); //Unlike regular HTTP (request  response  done), Socket.IO keeps a persistent connection open so the server can push messages to clients instantly without the client asking.
 
 const jwt = require("jsonwebtoken"); //creates unique tokens for verifying the role of or the identity of the user. uses instead of sessions and cookies for authentication in socket io
 const logger = require("./logger");

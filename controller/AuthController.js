@@ -75,13 +75,12 @@ class AuthController extends BaseController {
     BaseController.sendSuccess(res, result.message, null, 200);
   });
   // reset password controller
-  // 2. add validation to resetPassword controller
   static resetPassword = BaseController.asyncHandler(async (req, res) => {
     const { token, password } = req.body;
     BaseController.validateRequest(resetPasswordValidation, {
       token,
       password,
-    }); // 👈 add this
+    }); 
     const result = await AuthService.resetPassword(token, password);
     BaseController.sendSuccess(res, result.message, null, 200);
   });

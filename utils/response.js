@@ -1,5 +1,6 @@
 const { ErrorUtils } = require("./errors");
 
+//response formatter class  
 class ResponseFormatter {
   static success(res, message, data = null, statusCode = 200, meta = null) {
     const response = {
