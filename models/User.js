@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const { type } = require("node:os");
 
 const userSchema = new mongoose.Schema(
   {
@@ -103,6 +104,17 @@ const userSchema = new mongoose.Schema(
     resetPasswordExpires: {
       type: Date,
     },
+    //otp verification functionality
+    otp: {
+      type: String,
+    },
+    otpValidationExpires: {
+      type: Date,
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
@@ -112,6 +124,12 @@ const userSchema = new mongoose.Schema(
 userSchema.pre("save", async function () {
   if (!this.isModified("password")) return;
   this.password = await bcrypt.hash(this.password, 12);
+});
+//hash otp if otp exists
+userSchema.pre("save", async function () {
+  if (this.isModified("otp") && this.otp) {
+    this.otp = await bcrypt.hash(this.otp, 10);
+  }
 });
 //compare provided password with hashed password in database before allowing login
 userSchema.methods.comparePassword = async function (candidatePassword) {

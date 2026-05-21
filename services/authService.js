@@ -1,5 +1,4 @@
 const User = require("../models/User");
-const OTP = require("../models/OTP");
 const bcrypt = require("bcrypt");
 const { generateUserToken } = require("../utils/jwt");
 const logger = require("../utils/logger");
@@ -17,21 +16,21 @@ class AuthService {
   static async register(userData) {
     try {
       // 1. check if email already exists
-      const existingUser = await User.findByEmail(userData.email);
+      const existingUser = await User.findOne({
+        email: userData.email,
+        isVerified: true,
+        otp: { $exists: false },
+      });
       if (existingUser) {
         throw new ConflictError("User with this email already exists");
       }
-
-      // 2. delete any old OTP for this email
-      await OTP.deleteMany({ email: userData.email });
-
+      await User.deleteOne({ email: userData.email, isVerified: false });
       // 3. generate OTP and save it with userData inside
       const otp = generateOTP();
-      await OTP.create({
-        email: userData.email,
+      await User.create({
+        ...userData,
         otp: otp,
-        expiresAt: new Date(Date.now() + 5 * 60 * 1000),
-        userData: userData, // ← store user data temporarily
+        otpValidationExpires: new Date(Date.now() + 5 * 60 * 1000),
       });
 
       // 4. send OTP email
@@ -53,7 +52,7 @@ class AuthService {
   static async verifyOTP({ email, otp }) {
     try {
       // 1. find otp record
-      const record = await OTP.findOne({ email });
+      const record = await User.findOne({ email });
       if (!record) {
         throw new AuthenticationError(
           "OTP not found. Please request a new one.",
@@ -61,8 +60,8 @@ class AuthService {
       }
 
       // 2. check if expired
-      if (new Date() > record.expiresAt) {
-        await OTP.deleteOne({ email });
+      if (new Date() > record.otpValidationExpires) {
+        await User.deleteOne({ email });
         throw new AuthenticationError(
           "OTP has expired. Please request a new one.",
         );
@@ -75,15 +74,19 @@ class AuthService {
       }
 
       // 4. delete OTP — it's used now
-      await OTP.deleteOne({ email });
+      await User.deleteOne({ email });
 
       // 5. create the user using stored userData
-      const user = new User({
-        ...record.userData, //  use the data saved during register
-        isVerified: true, //  mark as verified immediately
-      });
+      const {
+        otp: _,
+        otpValidationExpires,
+        _id,
+        __v,
+        ...userData
+      } = record.toObject();
+      const user = new User({ ...userData, isVerified: true });
+      user.$locals.skipPasswordHash = true;
       await user.save();
-
       // 6. generate token
       const token = generateUserToken({
         id: user._id,
@@ -262,7 +265,7 @@ class AuthService {
         .update(token)
         .digest("hex");
 
-      // ✅ find by token only first
+      //  find by token only first
       const user = await User.findOne({ resetPasswordToken: hashedToken });
       if (!user) throw new AuthenticationError("Invalid reset token");
 
@@ -270,9 +273,9 @@ class AuthService {
       console.log("Now:", new Date());
       console.log("Is expired:", user.resetPasswordExpires < Date.now());
 
-      // ✅ check expiry separately
+      //  check expiry separately
       if (user.resetPasswordExpires < Date.now()) {
-        user.resetPasswordToken = undefined; // ✅ undefined not null
+        user.resetPasswordToken = undefined;
         user.resetPasswordExpires = undefined;
         await user.save();
         throw new AuthenticationError(
@@ -280,9 +283,9 @@ class AuthService {
         );
       }
 
-      // ✅ valid — reset password
+      //  valid — reset password
       user.password = newPassword;
-      user.resetPasswordToken = undefined; // ✅ undefined not null
+      user.resetPasswordToken = undefined;
       user.resetPasswordExpires = undefined;
       await user.save();
 
