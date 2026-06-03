@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [
         function () {
-          return this.role !== "admin";
+          return this.role !== "admin" && this.provider === "local";
         },
         "Last name is required",
       ],
@@ -40,7 +40,12 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: [true, "Password is required"],
+      required: [
+        function () {
+          return this.provider === "local";
+        },
+        "Password is required",
+      ],
       minlength: [8, "Password must be at least 8 characters long"],
     },
     role: {
@@ -52,7 +57,7 @@ const userSchema = new mongoose.Schema(
       type: Date,
       required: [
         function () {
-          return this.role !== "admin";
+          return this.role !== "admin" && this.provider === "local";
         },
         "Date of birth is not provided",
       ],
@@ -61,7 +66,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [
         function () {
-          return this.role !== "admin";
+          return this.role !== "admin" && this.provider === "local";
         },
         "Gender is not provided",
       ],
@@ -113,6 +118,11 @@ const userSchema = new mongoose.Schema(
     isVerified: {
       type: Boolean,
       default: false,
+    },
+    provider: {
+      type: String,
+      enum: ["local", "google"],
+      default: "local",
     },
   },
   {

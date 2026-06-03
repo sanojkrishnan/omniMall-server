@@ -2,11 +2,10 @@ const express = require("express");
 const {
   register,
   login,
-  handleValidationError,
-  sanitizeUser,
   verifyOTP,
   forgotPassword,
   resetPassword,
+  googleAuth
 } = require("../controller/AuthController");
 const { upload } = require("../config/cloudinary");
 const {
@@ -38,5 +37,8 @@ router.delete("/profile/image", deleteProfileImage);
 // forgot password route
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);
+
+//google login method
+router.post("/google", googleAuth);
 
 module.exports = router;

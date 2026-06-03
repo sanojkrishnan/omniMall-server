@@ -1,11 +1,15 @@
+const { OAuth2Client } = require("google-auth-library");
 const AuthService = require("../services/authService");
 const {
   registerValidation,
   loginValidation,
   otpValidation,
   resetPasswordValidation,
+  googleAuthValidation,
 } = require("../utils/validation");
 const BaseController = require("./BaseController");
+const config = require("../config/config");
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 class AuthController extends BaseController {
   //register controller
@@ -59,7 +63,7 @@ class AuthController extends BaseController {
       loginValidation,
       loginData,
     );
-    const result = await AuthService.login(validateData); // call service
+    const result = await AuthService.login(validateData);
 
     BaseController.sendSuccess(
       res,
@@ -80,9 +84,52 @@ class AuthController extends BaseController {
     BaseController.validateRequest(resetPasswordValidation, {
       token,
       password,
-    }); 
+    });
     const result = await AuthService.resetPassword(token, password);
     BaseController.sendSuccess(res, result.message, null, 200);
+  });
+
+  //google sign in method
+
+  static googleAuth = BaseController.asyncHandler(async (req, res) => {
+    const { credential } = req.body;
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: config.GOOGLE.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+
+    console.log("google payload", payload);
+    const userData = {
+      firstName: payload.given_name,
+      lastName: payload.family_name || null,
+      email: payload.email,
+      profileImage: payload.picture
+        ? {
+            url: payload.picture,
+            publicId: null,
+          }
+        : {
+            url: null,
+            publicId: null,
+          },
+    };
+
+    const validatedData = BaseController.validateRequest(
+      googleAuthValidation,
+      userData,
+    );
+
+    const result = await AuthService.googleAuthentication(validatedData);
+    BaseController.logAction("USER_REGISTER_USING_GOOGLE", result.user);
+
+    BaseController.sendSuccess(
+      res,
+      "User registered successfully. Welcome!",
+      result,
+      201,
+    );
   });
 }
 

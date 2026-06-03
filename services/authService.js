@@ -257,6 +257,44 @@ class AuthService {
     }
   }
 
+  //google auth services
+  static async googleAuthentication(userData) {
+    console.log("user data in auth service", userData);
+    try {
+      let user = await User.findOne({
+        email: userData.email,
+      });
+
+      if (!user) {
+        console.log("Creating user:", {
+          ...userData,
+          isVerified: true,
+        });
+        user = await User.create({
+          ...userData,
+          isVerified: true,
+        });
+      }
+
+      user.lastLogin = new Date();
+      await user.save();
+
+      const token = generateUserToken({
+        id: user._id,
+        email: user.email,
+        role: user.role,
+      });
+
+      return {
+        user: user.getPublicProfile(),
+        token,
+      };
+    } catch (error) {
+      logger.error("Google auth error:", error);
+      throw error;
+    }
+  }
+
   // AuthService.js - replace resetPassword
   static async resetPassword(token, newPassword) {
     try {

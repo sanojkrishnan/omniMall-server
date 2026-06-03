@@ -58,6 +58,22 @@ const resetPasswordValidation = Joi.object({
   token: Joi.string().required().messages(customMessages),
   password: strongPasswordValidation,
 });
+//google auth validation schema
+const googleAuthValidation = Joi.object({
+  firstName: commonPatterns.firstName.messages(customMessages),
+
+  lastName: Joi.string().allow(null).max(100).trim().messages(customMessages),
+
+  email: commonPatterns.email.messages(customMessages),
+
+  role: commonPatterns.role.messages(customMessages),
+
+  profileImage: Joi.object({
+    url: Joi.string().uri().allow(null),
+    publicId: Joi.string().allow(null),
+  }).optional(),
+  provider: Joi.string().default("google"),
+});
 
 //admin create validation schema
 const adminCreateValidation = Joi.object({
@@ -99,5 +115,6 @@ module.exports = {
   adminLoginValidation,
   loginValidation,
   adminCreateValidation,
+  googleAuthValidation,
   otpValidation,
 };
