@@ -14,6 +14,7 @@ const commonPatterns = {
   gender: Joi.string().valid("male", "female", "other").required(),
   status: Joi.string().valid("active", "banned", "inactive"),
   role: Joi.string().valid("user", "seller", "admin").default("user"),
+  isVerified: Joi.boolean().default(false),
 };
 const customMessages = {
   "string.min": "{#label} must be at least {#limit} characters long",
@@ -73,6 +74,9 @@ const googleAuthValidation = Joi.object({
     publicId: Joi.string().allow(null),
   }).optional(),
   provider: Joi.string().default("google"),
+  status: Joi.string()
+    .valid("active", "banned", "inactive")
+    .default("inactive"),
 });
 
 //admin create validation schema
@@ -80,6 +84,7 @@ const adminCreateValidation = Joi.object({
   name: Joi.string().min(2).max(100).trim().required(),
   email: commonPatterns.email.messages(customMessages),
   password: strongPasswordValidation,
+  status: commonPatterns.status.messages(customMessages),
 });
 //admin login validation
 const adminLoginValidation = loginValidation;
