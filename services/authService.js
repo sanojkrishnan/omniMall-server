@@ -295,6 +295,8 @@ class AuthService {
     }
   }
 
+  static async googleProfileCompletion( profileData) {
+
   // AuthService.js - replace resetPassword
   static async resetPassword(token, newPassword) {
     try {

@@ -126,11 +126,22 @@ class AuthController extends BaseController {
 
     BaseController.sendSuccess(
       res,
-      "User registered successfully. Welcome!",
+      "Please complete your registration by providing additional details",
       result,
       201,
     );
   });
+
+  //google profile completion controller
+  static googleProfileCompletion = BaseController.asyncHandler(
+    async (req, res) => {
+      const profileData = req.body;
+      const validatedData = BaseController.validateRequest(
+        googleProfileCompletionValidation,
+        profileData,
+      );
+    },
+  );
 }
 
 module.exports = AuthController;

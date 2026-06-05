@@ -40,5 +40,6 @@ router.post("/reset-password", resetPassword);
 
 //google login method
 router.post("/google", googleAuth);
+router.patch("/complete-profile", googleProfileCompletion);
 
 module.exports = router;

@@ -62,13 +62,9 @@ const resetPasswordValidation = Joi.object({
 //google auth validation schema
 const googleAuthValidation = Joi.object({
   firstName: commonPatterns.firstName.messages(customMessages),
-
   lastName: Joi.string().allow(null).max(100).trim().messages(customMessages),
-
   email: commonPatterns.email.messages(customMessages),
-
   role: commonPatterns.role.messages(customMessages),
-
   profileImage: Joi.object({
     url: Joi.string().uri().allow(null),
     publicId: Joi.string().allow(null),
@@ -77,6 +73,11 @@ const googleAuthValidation = Joi.object({
   status: Joi.string()
     .valid("active", "banned", "inactive")
     .default("inactive"),
+});
+//google profile completion validation schema
+const googleProfileCompletionValidation = Joi.object({
+  dateOfBirth: commonPatterns.dateOfBirth.messages(customMessages),
+  gender: commonPatterns.gender.messages(customMessages),
 });
 
 //admin create validation schema
@@ -121,5 +122,6 @@ module.exports = {
   loginValidation,
   adminCreateValidation,
   googleAuthValidation,
+  googleProfileCompletionValidation,
   otpValidation,
 };
