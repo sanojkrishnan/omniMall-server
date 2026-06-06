@@ -244,7 +244,7 @@ class AuthService {
         .digest("hex");
 
       user.resetPasswordToken = hashedToken;
-      user.resetPasswordExpires = new Date(Date.now() + 5 * 60 * 1000); // ✅ new Date()
+      user.resetPasswordExpires = new Date(Date.now() + 5 * 60 * 1000);
       await user.save();
 
       const resetURL = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
@@ -294,8 +294,36 @@ class AuthService {
       throw error;
     }
   }
+  // profile completing if the user is sign up with google account
+  static async googleProfileCompletion(profileData) {
+    try {
+      console.log("Profile Data:", profileData);
 
-  static async googleProfileCompletion( profileData) {
+      const user = await User.findByIdAndUpdate(
+        profileData.profileId,
+        {
+          dateOfBirth: profileData.dateOfBirth,
+          gender: profileData.gender,
+          status: "active",
+        },
+        {
+          new: true,
+          runValidators: true,
+        },
+      );
+
+      if (!user) {
+        throw new NotFoundError("User not found");
+      }
+
+      console.log("Updated User:", user);
+
+      return user.getPublicProfile();
+    } catch (error) {
+      logger.error("Something went wrong please try again:", error);
+      throw error;
+    }
+  }
 
   // AuthService.js - replace resetPassword
   static async resetPassword(token, newPassword) {

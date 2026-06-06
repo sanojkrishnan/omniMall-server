@@ -5,7 +5,8 @@ const {
   verifyOTP,
   forgotPassword,
   resetPassword,
-  googleAuth
+  googleAuth,
+  googleProfileCompletion
 } = require("../controller/AuthController");
 const { upload } = require("../config/cloudinary");
 const {

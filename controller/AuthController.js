@@ -6,6 +6,7 @@ const {
   otpValidation,
   resetPasswordValidation,
   googleAuthValidation,
+  googleProfileCompletionValidation,
 } = require("../utils/validation");
 const BaseController = require("./BaseController");
 const config = require("../config/config");
@@ -124,12 +125,22 @@ class AuthController extends BaseController {
     const result = await AuthService.googleAuthentication(validatedData);
     BaseController.logAction("USER_REGISTER_USING_GOOGLE", result.user);
 
-    BaseController.sendSuccess(
-      res,
-      "Please complete your registration by providing additional details",
-      result,
-      201,
-    );
+    if (result.user.status === "incomplete") {
+      return BaseController.sendSuccess(
+        res,
+        "Please complete your registration by providing additional details",
+        result,
+        201,
+      );
+    }
+    if (result.user.status === "active") {
+      return BaseController.sendSuccess(
+        res,
+        `Welcome back, ${result.user.firstName}!`,
+        result,
+        200,
+      );
+    }
   });
 
   //google profile completion controller
@@ -139,6 +150,15 @@ class AuthController extends BaseController {
       const validatedData = BaseController.validateRequest(
         googleProfileCompletionValidation,
         profileData,
+      );
+      const result = await AuthService.googleProfileCompletion(validatedData);
+      BaseController.logAction("GOOGLE_PROFILE_COMPLETION", result);
+
+      BaseController.sendSuccess(
+        res,
+        "All Done...! Your registration is complete.",
+        result,
+        201,
       );
     },
   );
