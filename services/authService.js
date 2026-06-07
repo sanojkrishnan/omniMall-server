@@ -15,30 +15,38 @@ class AuthService {
   //registration
   static async register(userData) {
     try {
-      // 1. check if email already exists
       const existingUser = await User.findOne({
         email: userData.email,
         isVerified: true,
         otp: { $exists: false },
       });
+
       if (existingUser) {
         throw new ConflictError("User with this email already exists");
       }
-      await User.deleteOne({ email: userData.email, isVerified: false });
-      // 3. generate OTP and save it with userData inside
+
+      await User.deleteOne({
+        email: userData.email,
+        isVerified: false,
+      });
+
       const otp = generateOTP();
-      await User.create({
+
+      const tempUser = await User.create({
         ...userData,
-        otp: otp,
+        otp,
         otpValidationExpires: new Date(Date.now() + 5 * 60 * 1000),
       });
 
-      // 4. send OTP email
-      await sendOTPEmail(userData.email, otp);
+      try {
+        await sendOTPEmail(userData.email, otp);
+      } catch (emailError) {
+        // rollback database record
+        await User.findByIdAndDelete(tempUser._id);
 
-      logger.info(`OTP sent to: ${userData.email}`);
+        throw new Error("Failed to send OTP email");
+      }
 
-      // 5. don't create user or token yet
       return {
         message:
           "OTP sent to your email. Please verify to complete registration.",
@@ -111,7 +119,7 @@ class AuthService {
       const { email, password } = credentials;
 
       const user = await User.findByEmail(email);
-      if (!user) {
+      if (!user || user.provider === "google") {
         throw new AuthenticationError("Invalid email or password");
       }
 

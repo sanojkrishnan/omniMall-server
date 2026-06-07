@@ -1,17 +1,17 @@
 require("dotenv").config();
 
 module.exports = {
-  PORT: process.env.PORT || 5000,
+  PORT: process.env.PORT,
 
-  MONGO_URL: process.env.MONGO_URL || "mongodb://localhost:27017/project",
+  MONGO_URL: process.env.MONGO_URL,
 
   CORS: {
-    ORIGIN: process.env.CORS_STR || "http://localhost:3000",
+    ORIGIN: process.env.CORS_STR,
     CREDENTIALS: true,
     METHODS: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     ALLOWED_HEADERS: ["Content-Type", "Authorization", "X-Requested-With"],
   },
-  NODE_ENV: process.env.NODE_ENV || "development",
+  NODE_ENV: process.env.NODE_ENV,
 
   RATE_LIMIT: {
     //to limit api calling
@@ -20,8 +20,8 @@ module.exports = {
     AUTH_MAX_REQUESTS: 5,
   },
   //admin seed
-  ADMIN_PASS: process.env.ADMIN_PASSWORD || "admin123",
-  ADMIN_EMAIL: process.env.ADMIN_EMAIL || "admin123@omnimall.com",
+  ADMIN_PASS: process.env.ADMIN_PASSWORD,
+  ADMIN_EMAIL: process.env.ADMIN_EMAIL,
 
   //jwt
   JWT_SECRET: {

@@ -41,7 +41,7 @@ class AuthController extends BaseController {
 
     BaseController.sendSuccess(
       res,
-      "User registered successfully. Welcome!",
+      "Pl;ease verify your email with the OTP sent to your inbox",
       result,
       201,
     );
