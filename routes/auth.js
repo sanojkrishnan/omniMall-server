@@ -24,6 +24,7 @@ router.post(
 );
 //otp verification route
 router.post("/verify-otp", verifyOTP);
+router.post("/resend-otp", verifyOTP);
 //login route
 router.post("/login", login);
 //image change

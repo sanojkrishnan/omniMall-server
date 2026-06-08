@@ -114,6 +114,42 @@ class AuthService {
     }
   }
 
+  //resend OTP
+  static async resendOTP({ email }) {
+    try {
+      const user = await User.findOne({ email });
+
+      if (!user) {
+        throw new NotFoundError("User not found");
+      }
+      if (
+        user.otpLastSentAt &&
+        Date.now() - user.otpLastSentAt.getTime() < 30 * 1000
+      ) {
+        throw new BadRequestError(
+          "Please wait 30 seconds before requesting another OTP",
+        );
+      }
+      const otp = generateOTP();
+      user.otp = otp;
+      user.otpValidationExpires = new Date(Date.now() + 5 * 60 * 1000);
+      user.otpLastSentAt = new Date();
+      await user.save();
+      try {
+        await sendOTPEmail(email, otp);
+      } catch (emailError) {
+        logger.error("Failed to send OTP email", emailError);
+        throw new Error("Failed to send OTP email");
+      }
+      return {
+        message: "OTP resent successfully",
+      };
+    } catch (error) {
+      logger.error("OTP resend error", error);
+      throw error;
+    }
+  }
+
   static async login(credentials) {
     try {
       const { email, password } = credentials;
@@ -273,6 +309,11 @@ class AuthService {
         email: userData.email,
       });
 
+      if (user && user.provider !== "google") {
+        throw new ConflictError(
+          "Email already registered with a different provider",
+        );
+      }
       if (!user) {
         console.log("Creating user:", {
           ...userData,
@@ -283,9 +324,10 @@ class AuthService {
           isVerified: true,
         });
       }
-
-      user.lastLogin = new Date();
-      await user.save();
+      if (user.provider === "google") {
+        user.lastLogin = new Date();
+        await user.save();
+      }
 
       const token = generateUserToken({
         id: user._id,

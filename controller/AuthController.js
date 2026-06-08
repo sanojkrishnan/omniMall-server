@@ -52,9 +52,22 @@ class AuthController extends BaseController {
     const data = req.body;
     const validateData = BaseController.validateRequest(otpValidation, data);
 
-    const result = await AuthService.verifyOTP(validateData); // call service
+    const result = await AuthService.verifyOTP(validateData);
 
     BaseController.sendSuccess(res, "OTP verified successfully", result, 200);
+  });
+
+  static resendOTP = BaseController.asyncHandler(async (req, res) => {
+    const data = req.body;
+
+    const validateData = BaseController.validateRequest(
+      resendOTPValidation,
+      data,
+    );
+
+    const result = await AuthService.resendOTP(validateData);
+
+    BaseController.sendSuccess(res, "OTP resent successfully", result, 200);
   });
 
   //login controller

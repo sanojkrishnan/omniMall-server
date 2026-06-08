@@ -15,7 +15,9 @@ const commonPatterns = {
   status: Joi.string().valid("active", "banned", "inactive"),
   role: Joi.string().valid("user", "seller", "admin").default("user"),
   isVerified: Joi.boolean().default(false),
-  profileId: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required(),
+  profileId: Joi.string()
+    .regex(/^[0-9a-fA-F]{24}$/)
+    .required(),
 };
 const customMessages = {
   "string.min": "{#label} must be at least {#limit} characters long",
@@ -75,11 +77,15 @@ const googleAuthValidation = Joi.object({
     .valid("active", "banned", "inactive", "incomplete")
     .default("incomplete"),
 });
+//resent otp validation schema
+const resendOTPValidation = Joi.object({
+  email: Joi.string().email().required(),
+});
 //google profile completion validation schema
 const googleProfileCompletionValidation = Joi.object({
   dateOfBirth: commonPatterns.dateOfBirth.messages(customMessages),
   gender: commonPatterns.gender.messages(customMessages),
-  profileId : commonPatterns.objectId.messages(customMessages),
+  profileId: commonPatterns.objectId.messages(customMessages),
 });
 
 //admin create validation schema
@@ -126,4 +132,5 @@ module.exports = {
   googleAuthValidation,
   googleProfileCompletionValidation,
   otpValidation,
+  resendOTPValidation,
 };
