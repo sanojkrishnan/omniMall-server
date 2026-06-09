@@ -6,7 +6,8 @@ const {
   forgotPassword,
   resetPassword,
   googleAuth,
-  googleProfileCompletion
+  googleProfileCompletion,
+  resendOTP,
 } = require("../controller/AuthController");
 const { upload } = require("../config/cloudinary");
 const {
@@ -24,7 +25,7 @@ router.post(
 );
 //otp verification route
 router.post("/verify-otp", verifyOTP);
-router.post("/resend-otp", verifyOTP);
+router.post("/resend-otp", resendOTP);
 //login route
 router.post("/login", login);
 //image change

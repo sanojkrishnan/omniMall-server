@@ -7,6 +7,7 @@ const {
   resetPasswordValidation,
   googleAuthValidation,
   googleProfileCompletionValidation,
+  resendOTPValidation,
 } = require("../utils/validation");
 const BaseController = require("./BaseController");
 const config = require("../config/config");
@@ -47,6 +48,20 @@ class AuthController extends BaseController {
     );
   });
 
+  //resent OTP controller
+  static resendOTP = BaseController.asyncHandler(async (req, res) => {
+    const data = req.body;
+
+    console.log("resend otp data", data);
+    const validateData = BaseController.validateRequest(
+      resendOTPValidation,
+      data,
+    );
+    const result = await AuthService.resendOTP(validateData);
+
+    BaseController.sendSuccess(res, "OTP resent successfully", result, 200);
+  });
+
   //otp verification controller
   static verifyOTP = BaseController.asyncHandler(async (req, res) => {
     const data = req.body;
@@ -55,19 +70,6 @@ class AuthController extends BaseController {
     const result = await AuthService.verifyOTP(validateData);
 
     BaseController.sendSuccess(res, "OTP verified successfully", result, 200);
-  });
-
-  static resendOTP = BaseController.asyncHandler(async (req, res) => {
-    const data = req.body;
-
-    const validateData = BaseController.validateRequest(
-      resendOTPValidation,
-      data,
-    );
-
-    const result = await AuthService.resendOTP(validateData);
-
-    BaseController.sendSuccess(res, "OTP resent successfully", result, 200);
   });
 
   //login controller
