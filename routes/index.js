@@ -16,6 +16,11 @@ const setupRoutes = (app) => {
     ...(shouldUseAuthLimiter ? [authLimiter] : []),
     authRoutes,
   );
+  app.use(
+    "/api/admin",
+    ...(shouldUseAuthLimiter ? [authLimiter] : []),
+    adminRoutes,
+  );
 };
 
 module.exports = {
