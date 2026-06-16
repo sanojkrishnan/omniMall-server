@@ -97,6 +97,11 @@ const adminCreateValidation = Joi.object({
 });
 //admin login validation
 const adminLoginValidation = loginValidation;
+
+//dashboard data fetch
+const dashboardValidation = Joi.object({
+  adminId : Joi.string().required("admin id is not matching"),
+})
 //pagination validation schema
 const ValidationHelpers = {
   validatePagination: (query) => {
@@ -129,6 +134,7 @@ module.exports = {
   adminLoginValidation,
   loginValidation,
   adminCreateValidation,
+  dashboardValidation,
   googleAuthValidation,
   googleProfileCompletionValidation,
   otpValidation,

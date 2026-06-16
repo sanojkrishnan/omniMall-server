@@ -1,5 +1,5 @@
-const AuthService = require("../services/authService");
-const { adminLoginValidation } = require("../utils/validation");
+const AdminService = require("../services/adminService");
+const { dashboardValidation } = require("../utils/validation");
 const BaseController = require("./BaseController");
 
 class AdminController extends BaseController {
@@ -8,18 +8,13 @@ class AdminController extends BaseController {
     dashboardData = req.body;
 
     const validatedData = BaseController.validateRequest(
-      adminLoginValidation,
+      dashboardValidation,
       dashboardData,
     );
-    const result = await AuthService.register(validatedData);
+    const result = await AdminService.dashboardFetch(validatedData);
     BaseController.logAction("USER_REGISTER", result.user);
 
-    BaseController.sendSuccess(
-      res,
-      "Please verify your email with the OTP sent to your inbox",
-      result,
-      201,
-    );
+    BaseController.sendSuccess(res, result, 201);
   });
 }
 
