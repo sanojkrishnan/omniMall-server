@@ -1,6 +1,8 @@
 const User = require("../models/User");
 const config = require("../config/config");
 const logger = require("../utils/logger");
+const Product = require("../models/Product");
+const Category = require("../models/Category");
 
 const seedAdmin = async () => {
   try {
@@ -79,10 +81,226 @@ const seedSampleUsers = async () => {
   }
 };
 
+const seedSampleCategories = async () => {
+  try {
+    if (config.NODE_ENV !== "development") return;
+
+    const sampleCategories = [
+      {
+        name: "Electronics",
+        subCategories: [
+          "Mobile Phones",
+          "Laptops",
+          "Tablets",
+          "Cameras",
+          "Smart Watches",
+        ],
+        availableColors: ["Black", "White", "Silver", "Gold"],
+        status: "active",
+        displaySection: "featured",
+        gender: "unisex",
+      },
+      {
+        name: "Home Appliances",
+        subCategories: [
+          "Refrigerators",
+          "Washing Machines",
+          "Air Conditioners",
+          "Microwaves",
+        ],
+        availableColors: ["White", "Silver", "Black"],
+        status: "active",
+        displaySection: "trending",
+        gender: "unisex",
+      },
+      {
+        name: "Beauty",
+        subCategories: [
+          "Skincare",
+          "Haircare",
+          "Makeup",
+          "Fragrances",
+          "Nail Care",
+        ],
+        availableColors: ["Pink", "Red", "Nude", "White"],
+        status: "active",
+        displaySection: "new arrivals",
+        gender: "women",
+      },
+      {
+        name: "Fashion",
+        subCategories: [
+          "T-Shirts",
+          "Jeans",
+          "Dresses",
+          "Jackets",
+          "Ethnic Wear",
+        ],
+        availableColors: ["Red", "Blue", "Black", "White", "Green", "Yellow"],
+        status: "active",
+        displaySection: "sale",
+        gender: "unisex",
+      },
+      {
+        name: "Accessories",
+        subCategories: ["Bags", "Belts", "Sunglasses", "Watches", "Wallets"],
+        availableColors: ["Brown", "Black", "Tan", "Gold", "Silver"],
+        status: "active",
+        displaySection: "featured",
+        gender: "unisex",
+      },
+      {
+        name: "Beverages",
+        subCategories: [
+          "Juices",
+          "Energy Drinks",
+          "Tea & Coffee",
+          "Soft Drinks",
+          "Water",
+        ],
+        availableColors: ["Red", "Green", "Blue", "Yellow"],
+        status: "active",
+        displaySection: "trending",
+        gender: "unisex",
+      },
+    ];
+
+    const createdCategories = {};
+
+    for (const catData of sampleCategories) {
+      let category = await Category.findOne({ name: catData.name });
+      if (!category) {
+        category = new Category(catData);
+        await category.save();
+        logger.info(`Sample category created: ${catData.name}`);
+      }
+      createdCategories[catData.name] = category._id; // store real ObjectId
+    }
+
+    return createdCategories;
+  } catch (error) {
+    logger.error("Error seeding sample categories:", error);
+  }
+};
+
+// product seeding
+const seedSampleProducts = async () => {
+  try {
+    if (config.NODE_ENV !== "development") return;
+
+    // sellers check
+    const sellers = await User.find({ role: "seller" });
+    if (sellers.length === 0) {
+      logger.warn("No sellers found, skipping product seeding");
+      return;
+    }
+
+    // categories check — now outside the sellers block
+    const categoriesList = await Category.find({});
+    if (categoriesList.length === 0) {
+      logger.warn("No categories found, skipping product seeding");
+      return;
+    }
+
+    const categories = {};
+    categoriesList.forEach((cat) => {
+      categories[cat.name] = cat._id;
+    });
+
+    const seller1 = sellers[0]._id;
+    const seller2 = sellers[1]?._id || sellers[0]._id;
+    const seller3 = sellers[2]?._id || sellers[0]._id;
+
+    const sampleProducts = [
+      {
+        productName: "iPhone 16 Pro",
+        brand: "Apple",
+        productDesc:
+          "Latest Apple flagship smartphone with A18 Pro chip, advanced camera system, and titanium design.",
+        categoryId: categories["Electronics"],
+        sellerId: seller1,
+        couponId: null,
+        stock: 25,
+        mrp: 139900,
+        offerPrice: 129900,
+        productImage: ["placeholder.jpg"],
+      },
+      {
+        productName: "Galaxy S25 Ultra",
+        brand: "Samsung",
+        productDesc:
+          "Premium Android smartphone featuring a high-resolution camera, S Pen support, and AI features.",
+        categoryId: categories["Home Appliances"],
+        sellerId: seller1,
+        couponId: null,
+        stock: 18,
+        mrp: 124999,
+        offerPrice: 117999,
+        productImage: ["placeholder.jpg"],
+      },
+      {
+        productName: "Sony WH-1000XM5",
+        brand: "Sony",
+        productDesc:
+          "Industry-leading noise-canceling wireless headphones with exceptional sound quality.",
+        categoryId: categories["Beauty"],
+        sellerId: seller2,
+        couponId: null,
+        stock: 40,
+        mrp: 29990,
+        offerPrice: 26990,
+        productImage: ["placeholder.jpg"],
+      },
+      {
+        productName: "Nike Air Max 270",
+        brand: "Nike",
+        productDesc:
+          "Comfortable lifestyle sneakers with responsive cushioning and modern design.",
+        categoryId: categories["Beverages"],
+        sellerId: seller2,
+        couponId: null,
+        stock: 60,
+        mrp: 12995,
+        offerPrice: 10995,
+        productImage: ["placeholder.jpg"],
+      },
+      {
+        productName: "Dell XPS 15",
+        brand: "Dell",
+        productDesc:
+          "High-performance laptop suitable for developers, designers, and content creators.",
+        categoryId: categories["Fashion"],
+        sellerId: seller3,
+        couponId: null,
+        stock: 12,
+        mrp: 189999,
+        offerPrice: 174999,
+        productImage: ["placeholder.jpg"],
+      },
+    ];
+
+    for (const product of sampleProducts) {
+      const existingProduct = await Product.findOne({
+        sellerId: product.sellerId,
+        productName: product.productName,
+      });
+      if (!existingProduct) {
+        const newProduct = new Product(product);
+        await newProduct.save();
+        logger.info(`Sample product created: ${product.productName}`);
+      }
+    }
+  } catch (error) {
+    logger.error("Error seeding sample products:", error);
+  }
+};
+
 const runSeeders = async () => {
   try {
     await seedAdmin();
     await seedSampleUsers();
+    await seedSampleCategories();
+    await seedSampleProducts();
     logger.info("Database seeding completed");
   } catch (error) {
     logger.error("Database seeding failed:", error);
@@ -93,4 +311,6 @@ module.exports = {
   runSeeders,
   seedAdmin,
   seedSampleUsers,
+  seedSampleCategories,
+  seedSampleProducts,
 };

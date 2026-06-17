@@ -100,9 +100,53 @@ const adminLoginValidation = loginValidation;
 
 //dashboard data fetch
 const dashboardValidation = Joi.object({
-  adminId : Joi.string().required("admin id is not matching"),
-})
+  adminId: Joi.string().required(),
+});
 //pagination validation schema
+const paginationValidation = Joi.object({
+  page: Joi.number().integer().min(1).default(1),
+  limit: Joi.number().integer().min(1).max(100).default(10),
+});
+//product validation
+const productValidation = Joi.object({
+  productName: Joi.string().required(),
+  brand: Joi.string().required(),
+  productDesc: Joi.string().required(),
+  categoryId: Joi.string().required(),
+  sellerId: Joi.string().required(),
+  couponId: Joi.string().optional(),
+  stock: Joi.number().integer().min(0).required(),
+  mrp: Joi.number().positive().required(),
+  offerPrice: Joi.number().positive().max(Joi.ref("mrp")).required().messages({
+    "number.max": "Offer price must be less than or equal to MRP",
+  }),
+  productImage: Joi.array()
+    .items(
+      Joi.object({
+        mimetype: Joi.string()
+          .valid("image/jpeg", "image/png", "image/webp")
+          .required()
+          .messages({
+            "any.only": "Unsupported format (use JPEG, PNG, or WebP)",
+          }),
+        size: Joi.number()
+          .max(2 * 1024 * 1024)
+          .required()
+          .messages({
+            "number.max": "Each file must be 2MB or less",
+          }),
+      }),
+    )
+    .min(1)
+    .max(10)
+    .required()
+    .messages({
+      "array.min": "At least one product image is required",
+      "array.max": "You can upload a maximum of 10 images",
+      "any.required": "Product image is required",
+    }),
+});
+
 const ValidationHelpers = {
   validatePagination: (query) => {
     const { error, value } = paginationValidation.validate(query);
@@ -135,6 +179,8 @@ module.exports = {
   loginValidation,
   adminCreateValidation,
   dashboardValidation,
+  paginationValidation,
+  productValidation,
   googleAuthValidation,
   googleProfileCompletionValidation,
   otpValidation,

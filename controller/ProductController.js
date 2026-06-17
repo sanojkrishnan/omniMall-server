@@ -1,17 +1,58 @@
 const AdminService = require("../services/adminService");
 const ProductService = require("../services/productService");
-const { dashboardValidation } = require("../utils/validation");
+const {
+  paginationValidation,
+  productValidation,
+} = require("../utils/validation");
 const BaseController = require("./BaseController");
 
 class ProductController extends BaseController {
-  //product fetch
-  static productFetch = BaseController.asyncHandler(async (req, res) => {
+  //add product
+  static async addProduct(req, res) {
+    try {
+      const productInfo = req.query;
 
-    const result = await ProductService.fetchProduct(validatedData);
-    BaseController.logAction("ADD_PRODUCT", result.product);
+      const validatedProduct = BaseController.validateRequest(
+        productValidation,
+        productInfo,
+      );
 
-    BaseController.sendSuccess(res, result, 201);
-  });
+      const result = await ProductService.addProduct(validatedProduct);
+      return res.status(200).json({
+        success: true,
+        result,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  }
+  //fetch product
+  static async productFetch(req, res) {
+    try {
+      const pagination = req.query;
+      const validatePagination = BaseController.validateRequest(
+        paginationValidation,
+        pagination,
+      );
+
+      const result = await ProductService.fetchProduct({
+        validatePagination,
+      });
+
+      return res.status(200).json({
+        success: true,
+        ...result,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  }
 }
 
 module.exports = ProductController;
