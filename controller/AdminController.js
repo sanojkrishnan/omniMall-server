@@ -16,19 +16,6 @@ class AdminController extends BaseController {
 
     BaseController.sendSuccess(res, result, 201);
   });
- //fetch users for admin
-  static findSeller = BaseController.asyncHandler(async (req, res) => {
-    isAdminCall = req.query;
-    const validatedData = BaseController.validateRequest(
-      isAdminCallForSeller,
-      isAdminCall,
-    );
-    const result = await AdminService.findSeller(validatedData);
-
-    BaseController.logAction("SELLER_FETCH_FROM_ADMIN", result.user);
-
-    BaseController.sendSuccess(res, result, 201);
-  });
 }
 
 module.exports = AdminController;

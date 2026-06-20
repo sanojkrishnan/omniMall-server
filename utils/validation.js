@@ -195,8 +195,12 @@ const productValidation = Joi.object({
 });
 
 //admin call for seller
-const isAdminCallForSeller = Joi.object({
-  adminId: Joi.string().required().messages(customMessages),
+const isCallForSeller = Joi.object({
+  uniqueSellerIds: Joi.array()
+    .items(commonPatterns.objectId)
+    .min(1)
+    .required()
+    .messages(customMessages),
   page: Joi.number().integer().min(1).default(1).messages(customMessages),
   limit: Joi.number()
     .integer()
@@ -243,6 +247,6 @@ module.exports = {
   googleAuthValidation,
   googleProfileCompletionValidation,
   otpValidation,
-  isAdminCallForSeller,
+  isCallForSeller,
   resendOTPValidation,
 };

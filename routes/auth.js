@@ -8,6 +8,7 @@ const {
   googleAuth,
   googleProfileCompletion,
   resendOTP,
+  findSeller,
 } = require("../controller/AuthController");
 const { upload } = require("../config/cloudinary");
 const {
@@ -44,5 +45,8 @@ router.post("/reset-password", resetPassword);
 //google login method
 router.post("/google", googleAuth);
 router.patch("/complete-profile", googleProfileCompletion);
+
+//fetch all seller
+router.post("/seller", findSeller);
 
 module.exports = router;
