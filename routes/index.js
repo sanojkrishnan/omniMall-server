@@ -6,6 +6,7 @@ const adminRoutes = require("./admin"); //path for admin
 const userRoutes = require("./user"); //path for users
 const sellerRoutes = require("./seller"); //path for sellers
 const productRoutes = require("./product"); //path for products
+const categoryRoutes = require("./category"); //path for categories
 
 const setupRoutes = (app) => {
   //main protected routes
@@ -26,6 +27,16 @@ const setupRoutes = (app) => {
     "/api/product",
     ...(shouldUseAuthLimiter ? [authLimiter] : []),
     productRoutes,
+  );
+  app.use(
+    "/api/seller",
+    ...(shouldUseAuthLimiter ? [authLimiter] : []),
+    sellerRoutes,
+  );
+  app.use(
+    "/api/category",
+    ...(shouldUseAuthLimiter ? [authLimiter] : []),
+    categoryRoutes,
   );
 };
 

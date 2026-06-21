@@ -194,9 +194,24 @@ const productValidation = Joi.object({
     }),
 });
 
-//admin call for seller
+//call for seller
 const isCallForSeller = Joi.object({
-  uniqueSellerIds: Joi.array()
+  uniqueSellers: Joi.array()
+    .items(commonPatterns.objectId)
+    .min(1)
+    .required()
+    .messages(customMessages),
+  page: Joi.number().integer().min(1).default(1).messages(customMessages),
+  limit: Joi.number()
+    .integer()
+    .min(1)
+    .max(100)
+    .default(15)
+    .messages(customMessages),
+});
+//call for categories
+const isCallForCategory = Joi.object({
+  uniqueCategories: Joi.array()
     .items(commonPatterns.objectId)
     .min(1)
     .required()
@@ -248,5 +263,6 @@ module.exports = {
   googleProfileCompletionValidation,
   otpValidation,
   isCallForSeller,
+  isCallForCategory,
   resendOTPValidation,
 };

@@ -46,7 +46,4 @@ router.post("/reset-password", resetPassword);
 router.post("/google", googleAuth);
 router.patch("/complete-profile", googleProfileCompletion);
 
-//fetch all seller
-router.post("/seller", findSeller);
-
 module.exports = router;

@@ -178,27 +178,6 @@ class AuthController extends BaseController {
       );
     },
   );
-
-  //fetch users
-  static findSeller = BaseController.asyncHandler(async (req, res) => {
-    const { page, limit } = req.query;
-    const sellers = req.body;
-
-    const validatedData = BaseController.validateRequest(
-      isCallForSeller,
-      sellers,
-    );
-
-    const result = await AuthService.findSeller(
-      Number(page) || 1,
-      Number(limit) || 15,
-      validatedData.uniqueSellers,
-    );
-
-    BaseController.logAction("SELLER_FETCH_", result.data);
-
-    BaseController.sendSuccess(res, result, 200);
-  });
 }
 
 module.exports = AuthController;
