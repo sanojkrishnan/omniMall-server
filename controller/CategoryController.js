@@ -12,7 +12,6 @@ class CategoryController extends BaseController {
       isCallForCategory,
       categories,
     );
-
     const result = await CategoryService.findCategory(
       Number(page) || 1,
       Number(limit) || 15,

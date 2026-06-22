@@ -1,4 +1,3 @@
-const AdminService = require("../services/adminService");
 const ProductService = require("../services/productService");
 const {
   paginationValidation,
@@ -7,52 +6,62 @@ const {
 const BaseController = require("./BaseController");
 
 class ProductController extends BaseController {
-  //add product
-  static async addProduct(req, res) {
-    try {
-      const productInfo = req.query;
+  // add product
+  static addProduct = BaseController.asyncHandler(async (req, res) => {
+    const productInfo = req.body;
 
-      const validatedProduct = BaseController.validateRequest(
-        productValidation,
-        productInfo,
-      );
-
-      const result = await ProductService.addProduct(validatedProduct);
-      return res.status(200).json({
-        success: true,
-        result,
-      });
-    } catch (error) {
-      return res.status(500).json({
-        success: false,
-        message: error.message,
-      });
+    // attach image if uploaded
+    if (req.file) {
+      productInfo.image = {
+        url: req.file.path,
+        publicId: req.file.filename,
+      };
     }
-  }
-  //fetch product
-  static async productFetch(req, res) {
-    try {
-      const pagination = req.query;
-      const validatePagination = BaseController.validateRequest(
-        paginationValidation,
-        pagination,
-      );
 
-      const result = await ProductService.fetchProduct({
-        validatePagination,
-      });
+    const validatedProduct = BaseController.validateRequest(
+      productValidation,
+      productInfo,
+    );
 
-      return res.status(200).json({
-        success: true,
-        ...result,
-      });
-    } catch (error) {
-      return res.status(500).json({
-        success: false,
-        message: error.message,
-      });
-    }
-  }
+    const result = await ProductService.addProduct(validatedProduct);
+    BaseController.logAction("PRODUCT_ADDED", result);
+
+    BaseController.sendSuccess(res, "Product added successfully", result, 201);
+  });
+
+  // fetch products
+  static productFetch = BaseController.asyncHandler(async (req, res) => {
+    const pagination = req.query;
+
+    const validatePagination = BaseController.validateRequest(
+      paginationValidation,
+      pagination,
+    );
+
+    const result = await ProductService.fetchProduct({ validatePagination });
+
+    BaseController.sendSuccess(
+      res,
+      "Products fetched successfully",
+      result,
+      200,
+    );
+  });
+
+  // delete product
+  static deleteProduct = BaseController.asyncHandler(async (req, res) => {
+    const { id } = req.params;
+
+    const result = await ProductService.deleteProduct(id);
+    BaseController.logAction("PRODUCT_DELETED", result);
+
+    BaseController.sendSuccess(
+      res,
+      "Product deleted successfully",
+      { id },
+      200,
+    );
+  });
 }
 
 module.exports = ProductController;
