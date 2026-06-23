@@ -29,29 +29,10 @@ const categorySchema = new mongoose.Schema(
       required: [true, "Available colors are required"],
       default: [],
     },
-    status: {
-      type: String,
-      enum: {
-        values: ["active", "inactive"],
-        message: "Status must be active or inactive",
-      },
-      default: "active",
-    },
-    displaySection: {
-      type: String,
-      enum: {
-        values: ["featured", "trending", "new arrivals", "sale"],
-        message: "Invalid display section",
-      },
-      default: "featured",
-    },
-    gender: {
-      type: String,
-      enum: {
-        values: ["men", "women", "unisex", "kids"],
-        message: "Gender must be men, women, unisex or kids",
-      },
-      required: [true, "Gender is required"],
+    specSheet: {
+      type: [Object],
+      require: [true, "Spec sheet is a must"],
+      default: [],
     },
   },
   { timestamps: true },

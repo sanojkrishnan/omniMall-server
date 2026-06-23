@@ -10,13 +10,14 @@ class ProductController extends BaseController {
   static addProduct = BaseController.asyncHandler(async (req, res) => {
     const productInfo = req.body;
 
-    // attach image if uploaded
-    if (req.file) {
-      productInfo.image = {
-        url: req.file.path,
-        publicId: req.file.filename,
-      };
+    if (!req.files || req.files.length === 0) {
+      throw new Error("At least one product image is required");
     }
+
+    productInfo.productImage = req.files.map((file) => ({
+      url: file.path,
+      publicId: file.filename,
+    }));
 
     const validatedProduct = BaseController.validateRequest(
       productValidation,
@@ -24,7 +25,6 @@ class ProductController extends BaseController {
     );
 
     const result = await ProductService.addProduct(validatedProduct);
-    BaseController.logAction("PRODUCT_ADDED", result);
 
     BaseController.sendSuccess(res, "Product added successfully", result, 201);
   });
@@ -38,7 +38,7 @@ class ProductController extends BaseController {
       pagination,
     );
 
-    const result = await ProductService.fetchProduct({ validatePagination });
+    const result = await ProductService.fetchProduct(validatePagination);
 
     BaseController.sendSuccess(
       res,

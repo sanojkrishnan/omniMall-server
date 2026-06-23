@@ -151,9 +151,9 @@ const productValidation = Joi.object({
   productName: Joi.string().required().messages(customMessages),
   brand: Joi.string().required().messages(customMessages),
   productDesc: Joi.string().required().messages(customMessages),
-  categoryId: Joi.string().required().messages(customMessages),
-  sellerId: Joi.string().required().messages(customMessages),
-  couponId: Joi.string().optional().messages(customMessages),
+  categoryId: commonPatterns.objectId.required(),
+  sellerId: commonPatterns.objectId.required(),
+  couponId: commonPatterns.objectId.allow("").optional(),
   stock: Joi.number().integer().min(0).required().messages(customMessages),
   mrp: Joi.number().positive().required().messages(customMessages),
   offerPrice: Joi.number()
@@ -164,23 +164,12 @@ const productValidation = Joi.object({
       ...customMessages,
       "number.max": "Offer price must be less than or equal to MRP",
     }),
+  offerPercentage: Joi.number().integer().required().messages(customMessages),
   productImage: Joi.array()
     .items(
       Joi.object({
-        mimetype: Joi.string()
-          .valid("image/jpeg", "image/png", "image/webp")
-          .required()
-          .messages({
-            ...customMessages,
-            "any.only": "Unsupported format (use JPEG, PNG, or WebP)",
-          }),
-        size: Joi.number()
-          .max(2 * 1024 * 1024)
-          .required()
-          .messages({
-            ...customMessages,
-            "number.max": "Each file must be 2MB or less",
-          }),
+        url: Joi.string().uri().required(),
+        publicId: Joi.string().required(),
       }),
     )
     .min(1)

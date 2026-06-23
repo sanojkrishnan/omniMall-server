@@ -2,6 +2,7 @@
 const { cloudinary } = require("../config/cloudinary");
 const User = require("../models/User");
 
+//for profile photo uploading (single photo)
 const uploadProfileImage = async (req, res) => {
   try {
     if (!req.file) {
@@ -31,6 +32,7 @@ const uploadProfileImage = async (req, res) => {
   }
 };
 
+//for profile photo deletion (single photo)
 const deleteProfileImage = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
