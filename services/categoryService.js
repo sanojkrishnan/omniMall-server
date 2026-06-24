@@ -1,12 +1,14 @@
 const Category = require("../models/Category");
+const logger = require("../utils/logger");
 
 class CategoryService {
-  //fetch all category users
   static async findCategory(page = 1, limit = 15, uniqueCategories = []) {
     try {
-      const skip = (page - 1) * limit;
+      uniqueCategories = uniqueCategories ?? [];
 
-      const filter = { _id: { $in: uniqueCategories } };
+      const skip = (page - 1) * limit;
+      const filter =
+        uniqueCategories.length > 0 ? { _id: { $in: uniqueCategories } } : {};
 
       const [category, total] = await Promise.all([
         Category.find(filter).skip(skip).limit(limit),
@@ -25,7 +27,7 @@ class CategoryService {
         },
       };
     } catch (error) {
-      logger.error("Category fetching error:", error);
+      logger.error("Category fetching error:", error); 
       throw error;
     }
   }

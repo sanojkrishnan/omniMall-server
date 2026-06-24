@@ -6,20 +6,18 @@ class SellerController extends BaseController {
   //fetch all sellers
   static findProductSeller = BaseController.asyncHandler(async (req, res) => {
     const { page, limit } = req.query;
-    const sellers = req.body;
+    const seller = req.body ?? {};
 
-    const validatedData = BaseController.validateRequest(
-      isCallForSeller,
-      sellers,
-    );
+    const validatedData =
+      BaseController.validateRequest(isCallForSeller, seller) ?? {};
 
     const result = await AuthService.findSeller(
       Number(page) || 1,
       Number(limit) || 15,
-      validatedData.uniqueSellers,
+      validatedData.uniqueSellers || [],
     );
 
-    BaseController.logAction("SELLER_FETCH_", result.data);
+    BaseController.logAction("SELLERS_FETCH", result.data);
 
     BaseController.sendSuccess(
       res,

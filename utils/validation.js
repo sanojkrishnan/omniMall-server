@@ -187,8 +187,9 @@ const productValidation = Joi.object({
 const isCallForSeller = Joi.object({
   uniqueSellers: Joi.array()
     .items(commonPatterns.objectId)
-    .min(1)
-    .required()
+    .min(0)
+    .optional()
+    .default([])
     .messages(customMessages),
   page: Joi.number().integer().min(1).default(1).messages(customMessages),
   limit: Joi.number()
@@ -202,8 +203,9 @@ const isCallForSeller = Joi.object({
 const isCallForCategory = Joi.object({
   uniqueCategories: Joi.array()
     .items(commonPatterns.objectId)
-    .min(1)
-    .required()
+    .min(0)
+    .optional()
+    .default([])
     .messages(customMessages),
   page: Joi.number().integer().min(1).default(1).messages(customMessages),
   limit: Joi.number()

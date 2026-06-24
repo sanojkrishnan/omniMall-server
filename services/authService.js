@@ -417,17 +417,21 @@ class AuthService {
   //fetch all seller users
   static async findSeller(page = 1, limit = 15, uniqueSellers = []) {
     try {
+      uniqueSellers = uniqueSellers ?? [];
+
       const skip = (page - 1) * limit;
+      const filter =
+        uniqueSellers.length > 0
+          ? { _id: { $in: uniqueSellers }, role: "seller" }
+          : { role: "seller" };
 
-      const filter = { _id: { $in: uniqueSellers }, role: "seller" };
-
-      const [seller, total] = await Promise.all([
+      const [sellers, total] = await Promise.all([
         User.find(filter).skip(skip).limit(limit),
         User.countDocuments(filter),
       ]);
 
       return {
-        data: seller,
+        data: sellers,
         pagination: {
           total,
           page,
@@ -438,7 +442,7 @@ class AuthService {
         },
       };
     } catch (error) {
-      logger.error("Seller fetching error:", error);
+      logger.error("Sellers fetching error:", error);
       throw error;
     }
   }
