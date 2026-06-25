@@ -3,6 +3,7 @@ const config = require("../config/config");
 const logger = require("../utils/logger");
 const Product = require("../models/Product");
 const Category = require("../models/Category");
+const productDocs = require("../dev/productData");
 
 const seedAdmin = async () => {
   try {
@@ -170,73 +171,7 @@ const seedSampleProducts = async () => {
     const seller2 = sellers[1]?._id || sellers[0]._id;
     const seller3 = sellers[2]?._id || sellers[0]._id;
 
-    const sampleProducts = [
-      {
-        productName: "iPhone 16 Pro",
-        brand: "Apple",
-        productDesc:
-          "Latest Apple flagship smartphone with A18 Pro chip, advanced camera system, and titanium design.",
-        categoryId: categories["Electronics"],
-        sellerId: seller1,
-        couponId: null,
-        stock: 25,
-        mrp: 139900,
-        offerPrice: 129900,
-        productImage: ["placeholder.jpg"],
-      },
-      {
-        productName: "Galaxy S25 Ultra",
-        brand: "Samsung",
-        productDesc:
-          "Premium Android smartphone featuring a high-resolution camera, S Pen support, and AI features.",
-        categoryId: categories["Home Appliances"],
-        sellerId: seller1,
-        couponId: null,
-        stock: 18,
-        mrp: 124999,
-        offerPrice: 117999,
-        productImage: ["placeholder.jpg"],
-      },
-      {
-        productName: "Sony WH-1000XM5",
-        brand: "Sony",
-        productDesc:
-          "Industry-leading noise-canceling wireless headphones with exceptional sound quality.",
-        categoryId: categories["Beauty"],
-        sellerId: seller2,
-        couponId: null,
-        stock: 40,
-        mrp: 29990,
-        offerPrice: 26990,
-        productImage: ["placeholder.jpg"],
-      },
-      {
-        productName: "Nike Air Max 270",
-        brand: "Nike",
-        productDesc:
-          "Comfortable lifestyle sneakers with responsive cushioning and modern design.",
-        categoryId: categories["Beverages"],
-        sellerId: seller2,
-        couponId: null,
-        stock: 60,
-        mrp: 12995,
-        offerPrice: 10995,
-        productImage: ["placeholder.jpg"],
-      },
-      {
-        productName: "Dell XPS 15",
-        brand: "Dell",
-        productDesc:
-          "High-performance laptop suitable for developers, designers, and content creators.",
-        categoryId: categories["Fashion"],
-        sellerId: seller3,
-        couponId: null,
-        stock: 12,
-        mrp: 189999,
-        offerPrice: 174999,
-        productImage: ["placeholder.jpg"],
-      },
-    ];
+    const sampleProducts = productDocs;
 
     for (const product of sampleProducts) {
       const existingProduct = await Product.findOne({

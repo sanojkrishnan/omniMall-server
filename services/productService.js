@@ -1,5 +1,6 @@
 const logger = require("../utils/logger");
 const Product = require("../models/Product");
+const { NotFoundError } = require("../utils/errors");
 
 class ProductService {
   static async addProduct(productData) {
@@ -21,17 +22,21 @@ class ProductService {
         Product.countDocuments(),
       ]);
 
-      return {
-        data: products,
-        pagination: {
-          total,
-          page,
-          limit,
-          totalPages: Math.ceil(total / limit),
-          hasNextPage: page < Math.ceil(total / limit),
-          hasPrevPage: page > 1,
-        },
-      };
+      if (products.length === 0) {
+        throw new NotFoundError("Products are empty");
+      } else {
+        return {
+          data: products,
+          pagination: {
+            total,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit),
+            hasNextPage: page < Math.ceil(total / limit),
+            hasPrevPage: page > 1,
+          },
+        };
+      }
     } catch (error) {
       logger.error("Fetch product error:", error);
       throw error;

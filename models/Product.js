@@ -57,6 +57,7 @@ const productSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    ordered: { type: Number, default: 0 },
     productImage: [
       {
         url: {
