@@ -76,6 +76,12 @@ const productSchema = new mongoose.Schema(
   },
 );
 
+productSchema.index({
+  productName: "text",
+  brand: "text",
+  productDesc: "text",
+});
+
 productSchema.pre("save", function () {
   if (this.mrp > 0) {
     this.offerPercentage = Math.round(

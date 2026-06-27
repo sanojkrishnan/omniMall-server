@@ -13,35 +13,94 @@ class ProductService {
     }
   }
   //fetch products with pagination from the database
-  static async fetchProduct({ page = 1, limit = 15 } = {}) {
+  static async fetchProduct({
+    page = 1,
+    limit = 15,
+    search = "",
+    category = "",
+    minPrice = "",
+    maxPrice = "",
+    sort = "newest",
+  } = {}) {
     try {
-      const skip = (page - 1) * limit;
+      const filter = {};
+
+      // Text search across productName, brand, productDesc
+      if (search) {
+        filter.$text = { $search: search };
+      }
+
+      // Category: look up by name first, then filter by its ObjectId
+      if (category) {
+        const categoryDoc = await Category.findOne({
+          name: { $regex: new RegExp(category, "i") }, // case-insensitive match
+        }).lean();
+
+        if (!categoryDoc) {
+          // category name doesn't exist — return empty result immediately
+          return {
+            data: [],
+            pagination: {
+              total: 0,
+              page: Number(page),
+              limit: Number(limit),
+              totalPages: 0,
+              hasNextPage: false,
+              hasPrevPage: false,
+            },
+          };
+        }
+
+        filter.categoryId = categoryDoc._id;
+      }
+
+      // Price range
+      if (minPrice || maxPrice) {
+        filter.offerPrice = {};
+        if (minPrice) filter.offerPrice.$gte = Number(minPrice);
+        if (maxPrice) filter.offerPrice.$lte = Number(maxPrice);
+      }
+
+      // Sort
+      const sortOptions = {
+        price_asc: { offerPrice: 1 },
+        price_desc: { offerPrice: -1 },
+        newest: { createdAt: -1 },
+        oldest: { createdAt: 1 },
+      };
+      const sortOption = sortOptions[sort] || { createdAt: -1 };
+
+      const skip = (Number(page) - 1) * Number(limit);
 
       const [products, total] = await Promise.all([
-        Product.find({}).skip(skip).limit(limit),
-        Product.countDocuments(),
+        Product.find(filter)
+          .sort(sortOption)
+          .skip(skip)
+          .limit(Number(limit))
+          .populate("categoryId", "name")
+          .lean(),
+        Product.countDocuments(filter),
       ]);
 
-      if (products.length === 0) {
-        throw new NotFoundError("Products are empty");
-      } else {
-        return {
-          data: products,
-          pagination: {
-            total,
-            page,
-            limit,
-            totalPages: Math.ceil(total / limit),
-            hasNextPage: page < Math.ceil(total / limit),
-            hasPrevPage: page > 1,
-          },
-        };
-      }
+      const totalPages = Math.ceil(total / Number(limit));
+
+      return {
+        data: products,
+        pagination: {
+          total,
+          page: Number(page),
+          limit: Number(limit),
+          totalPages,
+          hasNextPage: Number(page) < totalPages,
+          hasPrevPage: Number(page) > 1,
+        },
+      };
     } catch (error) {
       logger.error("Fetch product error:", error);
       throw error;
     }
   }
+  //delete product
   static async deleteProduct(productId) {
     try {
       if (!productId) {

@@ -144,8 +144,33 @@ const paginationValidation = Joi.object({
     .max(100)
     .default(15)
     .messages(customMessages),
-});
 
+  // Search
+  search: Joi.string()
+    .trim()
+    .max(100)
+    .allow("")
+    .optional()
+    .messages(customMessages),
+
+  // Category filter — must be a valid ObjectId if provided
+  category: Joi.string()
+    .trim()
+    .max(100)
+    .allow("")
+    .optional()
+    .messages(customMessages),
+  // Price range
+  minPrice: Joi.number().min(0).optional().messages(customMessages),
+  maxPrice: Joi.number().min(0).optional().messages(customMessages),
+
+  // Sort
+  sort: Joi.string()
+    .valid("price_asc", "price_desc", "newest", "oldest")
+    .default("newest")
+    .optional()
+    .messages(customMessages),
+});
 //product validation
 const productValidation = Joi.object({
   productName: Joi.string().required().messages(customMessages),
@@ -164,7 +189,7 @@ const productValidation = Joi.object({
       ...customMessages,
       "number.max": "Offer price must be less than or equal to MRP",
     }),
-  offerPercentage: Joi.number().integer().required().messages(customMessages),
+  offerPercentage: Joi.number().integer().optional().messages(customMessages),
   productImage: Joi.array()
     .items(
       Joi.object({
