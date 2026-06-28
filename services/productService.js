@@ -67,6 +67,8 @@ class ProductService {
         price_desc: { offerPrice: -1 },
         newest: { createdAt: -1 },
         oldest: { createdAt: 1 },
+        priceLowToHigh: { offerPrice: 1 },
+        priceHighToLow: { offerPrice: -1 },
       };
       const sortOption = sortOptions[sort] || { createdAt: -1 };
 
