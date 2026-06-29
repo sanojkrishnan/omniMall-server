@@ -12,6 +12,26 @@ class ProductService {
       throw error;
     }
   }
+  //fetch single product with _id
+  static async fetchOneProduct(productId) {
+    try {
+      if (!productId) {
+        throw new Error("Product ID is required");
+      }
+
+      const product = await Product.findById(productId);
+
+      if (!product) {
+        throw new Error("Product not found");
+      }
+
+      logger.info("Product send:", product);
+      return product;
+    } catch (error) {
+      logger.error("Fetch product error:", error);
+      throw error;
+    }
+  }
   //fetch products with pagination from the database
   static async fetchProduct({
     page = 1,

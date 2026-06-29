@@ -26,6 +26,20 @@ class SellerController extends BaseController {
       200,
     );
   });
+  //fetch single seller
+  static fetchSingleSeller = BaseController.asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    console.log("SELLER ID :", id);
+    const result = await AuthService.fetchOneSeller(id);
+    BaseController.logAction("SINGLE_SELLER_FETCH", result);
+
+    BaseController.sendSuccess(
+      res,
+      "Seller fetched according to the id given",
+      result,
+      200,
+    );
+  });
 }
 
 module.exports = SellerController;

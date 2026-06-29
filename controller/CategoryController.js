@@ -25,6 +25,20 @@ class CategoryController extends BaseController {
       200,
     );
   });
+  //fetch single category
+  static fetchSingleCategory = BaseController.asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    console.log("CATEGORY ID :", id);
+    const result = await CategoryService.fetchOneCategory(id);
+    BaseController.logAction("SINGLE_CATEGORY_FETCH", result);
+
+    BaseController.sendSuccess(
+      res,
+      "Category fetched according to the id given",
+      result,
+      200,
+    );
+  });
 }
 
 module.exports = CategoryController;

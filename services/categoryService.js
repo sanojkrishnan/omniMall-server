@@ -27,7 +27,27 @@ class CategoryService {
         },
       };
     } catch (error) {
-      logger.error("Category fetching error:", error); 
+      logger.error("Category fetching error:", error);
+      throw error;
+    }
+  }
+  //fetch single category with _id
+  static async fetchOneCategory(categoryId) {
+    try {
+      if (!categoryId) {
+        throw new Error("Category ID is required");
+      }
+
+      const category = await Category.findById(categoryId);
+
+      if (!category) {
+        throw new Error("Category not found");
+      }
+
+      logger.info("Category send:", category);
+      return category;
+    } catch (error) {
+      logger.error("Fetch category error:", error);
       throw error;
     }
   }

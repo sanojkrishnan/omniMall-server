@@ -48,6 +48,20 @@ class ProductController extends BaseController {
       200,
     );
   });
+  //fetch single product
+  static fetchSingleProduct = BaseController.asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    console.log("PRODUCT ID :", id);
+    const result = await ProductService.fetchOneProduct(id);
+    BaseController.logAction("SINGLE_PRODUCT_FETCH", result);
+
+    BaseController.sendSuccess(
+      res,
+      "Product fetched according to the id given",
+      result,
+      200,
+    );
+  });
 
   // delete product
   static deleteProduct = BaseController.asyncHandler(async (req, res) => {
@@ -56,12 +70,7 @@ class ProductController extends BaseController {
     const result = await ProductService.deleteProduct(id);
     BaseController.logAction("PRODUCT_DELETED", result);
 
-    BaseController.sendSuccess(
-      res,
-      "Product deleted successfully",
-      { id },
-      200,
-    );
+    BaseController.sendSuccess(res, "Product deleted successfully", 200);
   });
 }
 

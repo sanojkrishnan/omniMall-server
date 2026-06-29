@@ -413,7 +413,7 @@ class AuthService {
       throw error;
     }
   }
-
+  //-------------------------------------seller part--------------------------------------------------------------------------
   //fetch all seller users
   static async findSeller(page = 1, limit = 15, uniqueSellers = []) {
     try {
@@ -443,6 +443,27 @@ class AuthService {
       };
     } catch (error) {
       logger.error("Sellers fetching error:", error);
+      throw error;
+    }
+  }
+
+  //fetch single seller with _id
+  static async fetchOneSeller(sellerId) {
+    try {
+      if (!sellerId) {
+        throw new Error("Seller ID is required");
+      }
+
+      const seller = await User.find({ _id: sellerId, role: "seller" });
+
+      if (!seller) {
+        throw new Error("Seller not found");
+      }
+
+      logger.info("Seller send:", seller);
+      return seller;
+    } catch (error) {
+      logger.error("Fetch seller error:", error);
       throw error;
     }
   }
