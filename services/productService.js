@@ -1,5 +1,6 @@
 const logger = require("../utils/logger");
 const Product = require("../models/Product");
+const Category = require("../models/Category");
 const { NotFoundError } = require("../utils/errors");
 
 class ProductService {
@@ -40,6 +41,7 @@ class ProductService {
     category = "",
     minPrice = "",
     maxPrice = "",
+    priceSort = "price_desc",
     sort = "newest",
   } = {}) {
     try {
@@ -81,16 +83,30 @@ class ProductService {
         if (maxPrice) filter.offerPrice.$lte = Number(maxPrice);
       }
 
-      // Sort
-      const sortOptions = {
+      // Sort — price and date are independent axes, combined when both are present
+      const sortFieldMap = {
         price_asc: { offerPrice: 1 },
         price_desc: { offerPrice: -1 },
+      };
+      const dateFieldMap = {
         newest: { createdAt: -1 },
         oldest: { createdAt: 1 },
-        priceLowToHigh: { offerPrice: 1 },
-        priceHighToLow: { offerPrice: -1 },
       };
-      const sortOption = sortOptions[sort] || { createdAt: -1 };
+
+      const priceSortField = sortFieldMap[priceSort];
+      const dateSortField = dateFieldMap[sort];
+
+      let sortOption;
+      if (priceSortField && dateSortField) {
+        // price as primary sort, date as tiebreaker
+        sortOption = { ...priceSortField, ...dateSortField };
+      } else if (priceSortField) {
+        sortOption = priceSortField;
+      } else if (dateSortField) {
+        sortOption = dateSortField;
+      } else {
+        sortOption = { createdAt: -1 };
+      }
 
       const skip = (Number(page) - 1) * Number(limit);
 

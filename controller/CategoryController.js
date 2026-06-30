@@ -22,7 +22,7 @@ class CategoryController extends BaseController {
       res,
       "Category fetched successfully",
       result,
-      200,
+      200, 
     );
   });
   //fetch single category
