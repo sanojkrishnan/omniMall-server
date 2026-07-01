@@ -31,14 +31,21 @@ class ProductController extends BaseController {
 
   // fetch products
   static productFetch = BaseController.asyncHandler(async (req, res) => {
-    const { page, limit, search, category, minPrice, maxPrice, sort } =
-      req.query;
+    const {
+      page,
+      limit,
+      search,
+      category,
+      minPrice,
+      maxPrice,
+      priceSort,
+      sort,
+    } = req.query;
 
     const validatePagination = BaseController.validateRequest(
       paginationValidation,
-      { page, limit, search, category, minPrice, maxPrice, sort },
+      { page, limit, search, category, minPrice, maxPrice, priceSort, sort },
     );
-
     const result = await ProductService.fetchProduct(validatePagination);
 
     BaseController.sendSuccess(

@@ -160,6 +160,7 @@ const paginationValidation = Joi.object({
     .allow("")
     .optional()
     .messages(customMessages),
+  priceSort: Joi.string().valid("price_asc", "price_desc").optional(),
   // Price range
   minPrice: Joi.number().min(0).optional().messages(customMessages),
   maxPrice: Joi.number().min(0).optional().messages(customMessages),
