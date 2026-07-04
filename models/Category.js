@@ -19,6 +19,16 @@ const categorySchema = new mongoose.Schema(
       trim: true,
       unique: true,
     },
+    categoryImage: {
+      url: {
+        type: String,
+        required: [true, "Category image URL is required"],
+      },
+      publicId: {
+        type: String,
+        required: [true, "Category image publicId is required"],
+      },
+    },
     subCategories: {
       type: [String],
       required: [true, "Sub category is required"],

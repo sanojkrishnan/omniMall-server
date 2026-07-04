@@ -4,6 +4,7 @@ const logger = require("../utils/logger");
 const Product = require("../models/Product");
 const Category = require("../models/Category");
 const productDocs = require("../dev/productData");
+const categoryDocs = require("../dev/categoryData");
 
 const seedAdmin = async () => {
   try {
@@ -86,44 +87,7 @@ const seedSampleCategories = async () => {
   try {
     if (config.NODE_ENV !== "development") return;
 
-    const sampleCategories = [
-      {
-        name: "Electronics",
-        subCategories: ["Mobile Phones"],
-        availableColors: ["Black", "White", "Silver", "Gold"],
-        specSheet: [{ ram: 4 }, { rom: 120 }],
-      },
-      {
-        name: "Home Appliances",
-        subCategories: ["Mobile Phones"],
-        availableColors: ["Black", "White", "Silver", "Gold"],
-        specSheet: [{ ram: 4 }, { rom: 120 }],
-      },
-      {
-        name: "Beauty",
-        subCategories: ["Mobile Phones"],
-        availableColors: ["Black", "White", "Silver", "Gold"],
-        specSheet: [{ ram: 4 }, { rom: 120 }],
-      },
-      {
-        name: "Fashion",
-        subCategories: ["Mobile Phones"],
-        availableColors: ["Black", "White", "Silver", "Gold"],
-        specSheet: [{ ram: 4 }, { rom: 120 }],
-      },
-      {
-        name: "Accessories",
-        subCategories: ["Mobile Phones"],
-        availableColors: ["Black", "White", "Silver", "Gold"],
-        specSheet: [{ ram: 4 }, { rom: 120 }],
-      },
-      {
-        name: "Beverages",
-        subCategories: ["Mobile Phones"],
-        availableColors: ["Black", "White", "Silver", "Gold"],
-        specSheet: [{ ram: 4 }, { rom: 120 }],
-      },
-    ];
+    const sampleCategories = categoryDocs;
 
     const createdCategories = {};
 

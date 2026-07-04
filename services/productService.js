@@ -34,6 +34,7 @@ class ProductService {
     }
   }
   //fetch products with pagination from the database
+  // fetch products with pagination from the database
   static async fetchProduct({
     page = 1,
     limit = 15,
@@ -41,8 +42,9 @@ class ProductService {
     category = "",
     minPrice = "",
     maxPrice = "",
-    priceSort = "price_desc",
+    priceSort = "",
     sort = "newest",
+    isFeatured = false,
   } = {}) {
     try {
       const filter = {};
@@ -98,7 +100,6 @@ class ProductService {
 
       let sortOption;
       if (priceSortField && dateSortField) {
-        // price as primary sort, date as tiebreaker
         sortOption = { ...priceSortField, ...dateSortField };
       } else if (priceSortField) {
         sortOption = priceSortField;
@@ -110,6 +111,77 @@ class ProductService {
 
       const skip = (Number(page) - 1) * Number(limit);
 
+      // ---------- FEATURED PATH ----------
+      if (isFeatured) {
+        const pipeline = [
+          { $match: filter },
+          { $sort: { ordered: -1, createdAt: -1 } }, // most-ordered first, tiebreak by newest
+          {
+            $group: {
+              _id: "$categoryId",
+              product: { $first: "$$ROOT" },
+            },
+          },
+          { $replaceRoot: { newRoot: "$product" } },
+          { $sort: sortOption }, // apply the requested display sort to the featured set
+          {
+            $facet: {
+              data: [
+                { $skip: skip },
+                { $limit: Number(limit) },
+                {
+                  $lookup: {
+                    from: "categories",
+                    localField: "categoryId",
+                    foreignField: "_id",
+                    as: "categoryId",
+                  },
+                },
+                { $unwind: "$categoryId" },
+                {
+                  $project: {
+                    "categoryId.name": 1,
+                    "categoryId._id": 1,
+                    productName: 1,
+                    brand: 1,
+                    productDesc: 1,
+                    sellerId: 1,
+                    couponId: 1,
+                    stock: 1,
+                    mrp: 1,
+                    offerPrice: 1,
+                    offerPercentage: 1,
+                    ordered: 1,
+                    productImage: 1,
+                    createdAt: 1,
+                    updatedAt: 1,
+                  },
+                },
+              ],
+              totalCount: [{ $count: "count" }],
+            },
+          },
+        ];
+
+        const result = await Product.aggregate(pipeline);
+        const data = result[0]?.data ?? [];
+        const total = result[0]?.totalCount[0]?.count ?? 0;
+        const totalPages = Math.ceil(total / Number(limit));
+
+        return {
+          data,
+          pagination: {
+            total,
+            page: Number(page),
+            limit: Number(limit),
+            totalPages,
+            hasNextPage: Number(page) < totalPages,
+            hasPrevPage: Number(page) > 1,
+          },
+        };
+      }
+
+      // ---------- REGULAR PATH ----------
       const [products, total] = await Promise.all([
         Product.find(filter)
           .sort(sortOption)

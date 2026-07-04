@@ -10,7 +10,7 @@ const {
   resendOTP,
   findSeller,
 } = require("../controller/AuthController");
-const { upload } = require("../config/cloudinary");
+const { uploadUserImage } = require("../config/cloudinary");
 const {
   uploadProfileImage,
   deleteProfileImage,
@@ -20,7 +20,7 @@ const router = express.Router();
 //register route
 router.post(
   "/register",
-  upload.single("profileImage"),
+  uploadUserImage.single("profileImage"),
 
   register,
 );
@@ -32,7 +32,7 @@ router.post("/login", login);
 //image change
 router.post(
   "/profile/image",
-  upload.single("profileImage"),
+  uploadUserImage.single("profileImage"),
   uploadProfileImage,
 );
 //image edit
