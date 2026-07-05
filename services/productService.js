@@ -111,7 +111,7 @@ class ProductService {
 
       const skip = (Number(page) - 1) * Number(limit);
 
-      // ---------- FEATURED PATH ----------
+      //FEATURED PATH
       if (isFeatured) {
         const pipeline = [
           { $match: filter },

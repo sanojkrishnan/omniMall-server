@@ -40,12 +40,21 @@ class ProductController extends BaseController {
       maxPrice,
       priceSort,
       sort,
-      isFeatured,
     } = req.query;
-
+    const isFeatured = req.query.isFeatured === "true";
     const validatePagination = BaseController.validateRequest(
       paginationValidation,
-      { page, limit, search, category, minPrice, maxPrice, priceSort, sort, isFeatured },
+      {
+        page,
+        limit,
+        search,
+        category,
+        minPrice,
+        maxPrice,
+        priceSort,
+        sort,
+        isFeatured,
+      },
     );
     const result = await ProductService.fetchProduct(validatePagination);
 
