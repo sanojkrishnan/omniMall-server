@@ -8,7 +8,7 @@ const {
 const { uploadProductImage } = require("../config/cloudinary");
 const router = express.Router();
 
-router.get("/fetch", productFetch);
+router.post("/fetch", productFetch);
 router.post(
   "/register",
   uploadProductImage.array("productImage", 10),

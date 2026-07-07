@@ -4,7 +4,10 @@ class SellerService {
     try {
       const skip = (page - 1) * limit;
 
-      const filter = { _id: { $in: uniqueSellers }, role: "seller" };
+      const filter = { role: "seller" };
+      if (uniqueSellers.length > 0) {
+        filter._id = { $in: uniqueSellers };
+      }
 
       const [seller, total] = await Promise.all([
         User.find(filter).skip(skip).limit(limit),

@@ -2,6 +2,7 @@ const logger = require("../utils/logger");
 const Product = require("../models/Product");
 const Category = require("../models/Category");
 const { NotFoundError } = require("../utils/errors");
+const { default: mongoose } = require("mongoose");
 
 class ProductService {
   static async addProduct(productData) {
@@ -45,9 +46,22 @@ class ProductService {
     priceSort = "",
     sort = "newest",
     isFeatured = false,
+    ids = "", // <-- new: comma-separated string of product _ids
   } = {}) {
     try {
       const filter = {};
+
+      // Filter by specific product IDs (e.g. cart contents)
+      if (ids) {
+        const idList = ids
+          .split(",")
+          .filter(Boolean)
+          .filter((id) => mongoose.Types.ObjectId.isValid(id));
+
+        if (idList.length > 0) {
+          filter._id = { $in: idList };
+        }
+      }
 
       // Text search across productName, brand, productDesc
       if (search) {
@@ -181,7 +195,7 @@ class ProductService {
         };
       }
 
-      // ---------- REGULAR PATH ----------
+      //REGULAR PATH
       const [products, total] = await Promise.all([
         Product.find(filter)
           .sort(sortOption)

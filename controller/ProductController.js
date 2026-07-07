@@ -42,6 +42,8 @@ class ProductController extends BaseController {
       sort,
     } = req.query;
     const isFeatured = req.query.isFeatured === "true";
+    const { uniqueProducts } = req.body;
+
     const validatePagination = BaseController.validateRequest(
       paginationValidation,
       {
@@ -54,6 +56,7 @@ class ProductController extends BaseController {
         priceSort,
         sort,
         isFeatured,
+        ids: uniqueProducts?.length ? uniqueProducts.join(",") : "",
       },
     );
     const result = await ProductService.fetchProduct(validatePagination);
@@ -65,6 +68,7 @@ class ProductController extends BaseController {
       200,
     );
   });
+
   //fetch single product
   static fetchSingleProduct = BaseController.asyncHandler(async (req, res) => {
     const { id } = req.params;
