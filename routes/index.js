@@ -7,6 +7,7 @@ const userRoutes = require("./user"); //path for users
 const sellerRoutes = require("./seller"); //path for sellers
 const productRoutes = require("./product"); //path for products
 const categoryRoutes = require("./category"); //path for categories
+const cartRoutes = require("./cart"); //path for cart
 
 const setupRoutes = (app) => {
   //main protected routes
@@ -37,6 +38,11 @@ const setupRoutes = (app) => {
     "/api/category",
     ...(shouldUseAuthLimiter ? [authLimiter] : []),
     categoryRoutes,
+  );
+  app.use(
+    "/api/cart",
+    ...(shouldUseAuthLimiter ? [authLimiter] : []),
+    cartRoutes,
   );
 };
 

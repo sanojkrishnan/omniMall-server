@@ -243,6 +243,19 @@ const isCallForCategory = Joi.object({
     .messages(customMessages),
 });
 
+const isCallForCart = {
+  userId: Joi.string().required().messages(customMessages),
+};
+
+const addCartValidation = {
+  userId: Joi.string().required().message(customMessages),
+  cart: Joi.object({
+    sellerId: Joi.string().required().message(customMessages),
+    productId: Joi.string().required().message(customMessages),
+    qnty: Joi.number().required().min(1).max(10).message(customMessages),
+  }),
+};
+
 const ValidationHelpers = {
   validatePagination: (query) => {
     const { error, value } = paginationValidation.validate(query);
@@ -283,4 +296,6 @@ module.exports = {
   isCallForSeller,
   isCallForCategory,
   resendOTPValidation,
+  isCallForCart,
+  addCartValidation,
 };
