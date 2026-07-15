@@ -243,18 +243,29 @@ const isCallForCategory = Joi.object({
     .messages(customMessages),
 });
 
-const isCallForCart = {
-  userId: Joi.string().required().messages(customMessages),
-};
+const isCallForCart = Joi.object({
+  userId: commonPatterns.objectId.required().messages(customMessages),
+});
 
-const addCartValidation = {
-  userId: Joi.string().required().message(customMessages),
-  cart: Joi.object({
-    sellerId: Joi.string().required().message(customMessages),
-    productId: Joi.string().required().message(customMessages),
-    qnty: Joi.number().required().min(1).max(10).message(customMessages),
-  }),
-};
+const addCartValidation = Joi.object({
+  userId: commonPatterns.objectId.required().messages(customMessages),
+  cart: Joi.array()
+    .items(
+      Joi.object({
+        productId: commonPatterns.objectId.required().messages(customMessages),
+        sellerId: commonPatterns.objectId.required().messages(customMessages),
+        qnty: Joi.number()
+          .integer()
+          .min(1)
+          .max(10)
+          .required()
+          .messages(customMessages),
+      }),
+    )
+    .min(1)
+    .required()
+    .messages(customMessages),
+});
 
 const ValidationHelpers = {
   validatePagination: (query) => {

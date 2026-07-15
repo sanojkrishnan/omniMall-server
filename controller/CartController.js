@@ -4,19 +4,15 @@ const BaseController = require("./BaseController");
 
 class CartController extends BaseController {
   static fetchCart = BaseController.asyncHandler(async (req, res) => {
-    const userId = req.body;
-    const validatedData = BaseController.validateRequest(isCallForCart, userId);
+    const validatedData = BaseController.validateRequest(isCallForCart, {
+      userId: req.query.userId,
+    });
 
-    const result = await CartService.fetchCart(validatedData);
+    const result = await CartService.fetchCart(validatedData.userId);
 
-    BaseController.logAction("CATEGORY_FETCH", result.data);
+    BaseController.logAction("CART_FETCH", result);
 
-    BaseController.sendSuccess(
-      res,
-      "Category fetched successfully",
-      result,
-      200,
-    );
+    BaseController.sendSuccess(res, "Cart fetched successfully", result, 200);
   });
 
   static addCart = BaseController.asyncHandler(async (req, res) => {
@@ -26,12 +22,13 @@ class CartController extends BaseController {
       cart,
     });
 
-    const result = await CartService.addCart(id);
-    BaseController.logAction("SINGLE_CATEGORY_FETCH", result);
+    const result = await CartService.addCart(validatedData);
+
+    BaseController.logAction("CART_ADD", result);
 
     BaseController.sendSuccess(
       res,
-      "Category fetched according to the id given",
+      "Item added to cart successfully",
       result,
       200,
     );
