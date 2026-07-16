@@ -1,5 +1,11 @@
+const { error } = require("winston");
 const Cart = require("../models/Cart");
 const logger = require("../utils/logger");
+const {
+  AuthenticationError,
+  AuthorizationError,
+  NotFoundError,
+} = require("../utils/errors");
 
 class CartService {
   static async addCart(cartData) {
@@ -38,6 +44,34 @@ class CartService {
     try {
       const cart = await Cart.findOne({ userId });
       return cart;
+    } catch (error) {
+      logger.error("Cart error:", error);
+      throw error;
+    }
+  }
+
+  static async removeCart({ userId, productId }) {
+    try {
+      if (!userId) {
+        throw new AuthorizationError("User id is a must");
+      }
+      if (!productId) {
+        throw new NotFoundError("The product id is missing");
+      }
+
+      await Cart.updateOne(
+        { userId },
+        {
+          $pull: {
+            cart: {
+              productId: productId,
+            },
+          },
+        },
+      );
+      const updatedCart = await Cart.findOne({ userId });
+      console.log("WHAT IS INSIDE UPDATED CART:", updatedCart);
+      return updatedCart;
     } catch (error) {
       logger.error("Cart error:", error);
       throw error;

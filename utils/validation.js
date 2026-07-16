@@ -267,6 +267,11 @@ const addCartValidation = Joi.object({
     .messages(customMessages),
 });
 
+const removeCartValidation = Joi.object({
+  userId: commonPatterns.objectId.required().messages(customMessages),
+  productId: commonPatterns.objectId.required().messages(customMessages),
+});
+
 const ValidationHelpers = {
   validatePagination: (query) => {
     const { error, value } = paginationValidation.validate(query);
@@ -309,4 +314,5 @@ module.exports = {
   resendOTPValidation,
   isCallForCart,
   addCartValidation,
+  removeCartValidation,
 };

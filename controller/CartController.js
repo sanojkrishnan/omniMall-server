@@ -1,11 +1,15 @@
 const CartService = require("../services/cartService");
-const { isCallForCart, addCartValidation } = require("../utils/validation");
+const {
+  isCallForCart,
+  addCartValidation,
+  removeCartValidation,
+} = require("../utils/validation");
 const BaseController = require("./BaseController");
 
 class CartController extends BaseController {
   static fetchCart = BaseController.asyncHandler(async (req, res) => {
     const validatedData = BaseController.validateRequest(isCallForCart, {
-      userId: req.query.userId,
+      userId: req.user.id,
     });
 
     const result = await CartService.fetchCart(validatedData.userId);
@@ -16,7 +20,8 @@ class CartController extends BaseController {
   });
 
   static addCart = BaseController.asyncHandler(async (req, res) => {
-    const { userId, cart } = req.body;
+    const { cart } = req.body;
+    const userId = req.user.id;
     const validatedData = BaseController.validateRequest(addCartValidation, {
       userId,
       cart,
@@ -32,6 +37,22 @@ class CartController extends BaseController {
       result,
       200,
     );
+  });
+
+  static removeCart = BaseController.asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const userId = req.user.id; // From JWT/auth middleware
+
+    const validatedData = BaseController.validateRequest(removeCartValidation, {
+      userId,
+      productId: id,
+    });
+
+    const result = await CartService.removeCart(validatedData);
+
+    BaseController.logAction("CART_REMOVE", result);
+
+    BaseController.sendSuccess(res, "Product removed from cart", result, 200);
   });
 }
 
