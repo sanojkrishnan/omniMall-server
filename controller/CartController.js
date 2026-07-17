@@ -3,14 +3,18 @@ const {
   isCallForCart,
   addCartValidation,
   removeCartValidation,
+  updateCartQuantityValidation,
 } = require("../utils/validation");
 const BaseController = require("./BaseController");
 
 class CartController extends BaseController {
   static fetchCart = BaseController.asyncHandler(async (req, res) => {
+    const userId = req.user.id;
     const validatedData = BaseController.validateRequest(isCallForCart, {
-      userId: req.user.id,
+      userId,
     });
+
+    console.log("FETCHING CART:", userId);
 
     const result = await CartService.fetchCart(validatedData.userId);
 
@@ -47,13 +51,28 @@ class CartController extends BaseController {
       userId,
       productId: id,
     });
-
     const result = await CartService.removeCart(validatedData);
-
     BaseController.logAction("CART_REMOVE", result);
-
     BaseController.sendSuccess(res, "Product removed from cart", result, 200);
   });
+
+  static updateProductQuantity = BaseController.asyncHandler(
+    async (req, res) => {
+      const data = req.body;
+      const userId = req.user.id;
+      const validatedData = BaseController.validateRequest(
+        updateCartQuantityValidation,
+        {
+          userId,
+          ...data,
+        },
+      );
+      console.log("UPDATE QUANTITY :", data);
+      const result = await CartService.updateCartQuantity(validatedData);
+      BaseController.logAction("CART_REMOVE", result);
+      BaseController.sendSuccess(res, "Quantity updated", result, 200);
+    },
+  );
 }
 
 module.exports = CartController;

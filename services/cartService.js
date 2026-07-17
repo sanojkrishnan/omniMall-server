@@ -52,13 +52,6 @@ class CartService {
 
   static async removeCart({ userId, productId }) {
     try {
-      if (!userId) {
-        throw new AuthorizationError("User id is a must");
-      }
-      if (!productId) {
-        throw new NotFoundError("The product id is missing");
-      }
-
       await Cart.updateOne(
         { userId },
         {
@@ -70,8 +63,38 @@ class CartService {
         },
       );
       const updatedCart = await Cart.findOne({ userId });
-      console.log("WHAT IS INSIDE UPDATED CART:", updatedCart);
-      return updatedCart;
+      if (updatedCart.cart.length === 0) {
+        await Cart.deleteOne({ userId });
+        return null;
+      }
+      if (updatedCart.cart.length !== 0) {
+        return updatedCart;
+      }
+    } catch (error) {
+      logger.error("Cart error:", error);
+      throw error;
+    }
+  }
+
+  static async updateCartQuantity({ userId, productId, qnty }) {
+    try {
+      if (qnty === 0) {
+        await Cart.updateOne({ userId }, { $pull: { cart: { productId } } });
+
+        const updatedCart = await Cart.findOne({ userId });
+        if (updatedCart && updatedCart.cart.length === 0) {
+          await Cart.deleteOne({ userId });
+          return null;
+        }
+        return updatedCart;
+      }
+
+      await Cart.updateOne(
+        { userId, "cart.productId": productId },
+        { $set: { "cart.$.qnty": qnty } },
+      );
+
+      return await Cart.findOne({ userId });
     } catch (error) {
       logger.error("Cart error:", error);
       throw error;
