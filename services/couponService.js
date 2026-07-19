@@ -1,7 +1,7 @@
 const logger = require("../utils/logger");
 const Product = require("../models/Product");
 const User = require("../models/User");
-const { AuthenticationError } = require("../utils/errors");
+const { AuthenticationError, NotFoundError } = require("../utils/errors");
 const Coupon = require("../models/Coupon");
 
 const COUPON_SORT_MAP = {
@@ -11,17 +11,7 @@ const COUPON_SORT_MAP = {
   endDate_desc: { endDate: -1 },
 };
 
-class AdminService {
-  //fetch dashboard data
-  static async dashboardFetch(productData) {
-    try {
-      const product = await Product.create(productData);
-      return product;
-    } catch (error) {
-      logger.error("Add product error:", error);
-      throw error;
-    }
-  }
+class CouponService {
   //coupon fetch
   static async couponFetch(
     page = 1,
@@ -31,16 +21,6 @@ class AdminService {
     adminId,
   ) {
     try {
-      const user = await User.findById(adminId);
-
-      if (!user) {
-        throw new AuthenticationError("Admin not found");
-      }
-
-      if (user.role !== "admin") {
-        throw new AuthenticationError("Not authorized to view coupons");
-      }
-
       const query = {};
 
       if (search) {
@@ -72,6 +52,22 @@ class AdminService {
       throw error;
     }
   }
+
+  //single coupon fetch
+  static async singleCouponFetch(couponId) {
+    try {
+      const singleCoupon = await Coupon.findById(couponId);
+
+      if (!singleCoupon) {
+        throw new NotFoundError("This coupon douse not exist");
+      }
+
+      return singleCoupon;
+    } catch (error) {
+      logger.error("Fetch single coupon error:", error);
+      throw error;
+    }
+  }
 }
 
-module.exports = AdminService;
+module.exports = CouponService;

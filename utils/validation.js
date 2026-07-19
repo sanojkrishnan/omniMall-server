@@ -283,6 +283,10 @@ const updateCartQuantityValidation = Joi.object({
     .messages(customMessages),
 });
 
+const singleCouponFetchValidation = Joi.object({
+  couponId: commonPatterns.objectId.required().messages(customMessages),
+});
+
 const ValidationHelpers = {
   validatePagination: (query) => {
     const { error, value } = paginationValidation.validate(query);
@@ -326,5 +330,6 @@ module.exports = {
   isCallForCart,
   addCartValidation,
   removeCartValidation,
-  updateCartQuantityValidation
+  updateCartQuantityValidation,
+  singleCouponFetchValidation,
 };

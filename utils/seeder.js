@@ -5,6 +5,8 @@ const Product = require("../models/Product");
 const Category = require("../models/Category");
 const productDocs = require("../dev/productData");
 const categoryDocs = require("../dev/categoryData");
+const couponDocs = require("../dev/couponData");
+const Coupon = require("../models/Coupon");
 
 const seedAdmin = async () => {
   try {
@@ -153,12 +155,37 @@ const seedSampleProducts = async () => {
   }
 };
 
+const seedSampleCoupon = async () => {
+  try {
+    if (config.NODE_ENV !== "development") return;
+
+    const sampleCoupon = couponDocs;
+
+    const createdCoupons = {};
+
+    for (const couponData of sampleCoupon) {
+      let coupon = await Coupon.findOne({ name: couponData.name });
+      if (!coupon) {
+        coupon = new Coupon(couponData);
+        await coupon.save();
+        logger.info(`Sample coupon created: ${couponData.name}`);
+      }
+      createdCoupons[couponData.name] = coupon._id; // store real ObjectId
+    }
+
+    return createdCoupons;
+  } catch (error) {
+    logger.error("Error seeding sample coupons:", error);
+  }
+};
+
 const runSeeders = async () => {
   try {
     await seedAdmin();
     await seedSampleUsers();
     await seedSampleCategories();
     await seedSampleProducts();
+    await seedSampleCoupon();
     logger.info("Database seeding completed");
   } catch (error) {
     logger.error("Database seeding failed:", error);
@@ -171,4 +198,5 @@ module.exports = {
   seedSampleUsers,
   seedSampleCategories,
   seedSampleProducts,
+  seedSampleCoupon,
 };
