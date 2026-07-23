@@ -17,10 +17,6 @@ class ProductService {
   //fetch single product with _id
   static async fetchOneProduct(productId) {
     try {
-      if (!productId) {
-        throw new Error("Product ID is required");
-      }
-
       const product = await Product.findById(productId);
 
       if (!product) {
@@ -226,21 +222,41 @@ class ProductService {
   }
   //delete product
   static async deleteProduct(productId) {
-    try {
-      if (!productId) {
-        throw new Error("Product ID is required");
-      }
+    const product = await Product.findByIdAndDelete(productId);
 
-      const product = await Product.findByIdAndDelete(productId);
+    if (!product) {
+      throw new Error("Product not found");
+    }
+
+    logger.info("Product deleted:", productId);
+    return product;
+  }
+  catch(error) {
+    logger.error("Delete product error:", error);
+    throw error;
+  }
+  //update product
+  static async updateProduct({ data, id }) {
+    try {
+      const product = await Product.findByIdAndUpdate(
+        id,
+        {
+          $set: data,
+        },
+        {
+          new: true, // return updated document
+          runValidators: true, // apply schema validations
+        },
+      );
 
       if (!product) {
         throw new Error("Product not found");
       }
 
-      logger.info("Product deleted:", productId);
+      logger.info("Product updated:", id);
       return product;
     } catch (error) {
-      logger.error("Delete product error:", error);
+      logger.error("Update product error:", error);
       throw error;
     }
   }

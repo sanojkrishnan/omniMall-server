@@ -4,6 +4,7 @@ const {
   addProduct,
   deleteProduct,
   fetchSingleProduct,
+  updateProduct,
 } = require("../controller/ProductController");
 const { uploadProductImage } = require("../config/cloudinary");
 const router = express.Router();
@@ -16,5 +17,6 @@ router.post(
 );
 router.delete("/delete/:id", deleteProduct);
 router.get("/fetch-single/:id", fetchSingleProduct);
+router.patch("/update/:id", updateProduct);
 
 module.exports = router;

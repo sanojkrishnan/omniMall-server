@@ -2,7 +2,9 @@ const ProductService = require("../services/productService");
 const {
   paginationValidation,
   productValidation,
-} = require("../utils/validation");
+  validateId,
+  updateCartQuantityValidation,
+} = require("../validation/commonValidation");
 const BaseController = require("./BaseController");
 
 class ProductController extends BaseController {
@@ -72,8 +74,9 @@ class ProductController extends BaseController {
   //fetch single product
   static fetchSingleProduct = BaseController.asyncHandler(async (req, res) => {
     const { id } = req.params;
-    console.log("PRODUCT ID :", id);
-    const result = await ProductService.fetchOneProduct(id);
+
+    const validateData = BaseController.validateRequest(validateId, id);
+    const result = await ProductService.fetchOneProduct(validateData);
     BaseController.logAction("SINGLE_PRODUCT_FETCH", result);
 
     BaseController.sendSuccess(
@@ -88,10 +91,24 @@ class ProductController extends BaseController {
   static deleteProduct = BaseController.asyncHandler(async (req, res) => {
     const { id } = req.params;
 
-    const result = await ProductService.deleteProduct(id);
+    const validateData = BaseController.validateRequest(validateId, id);
+    const result = await ProductService.deleteProduct(validateData);
     BaseController.logAction("PRODUCT_DELETED", result);
 
     BaseController.sendSuccess(res, "Product deleted successfully", 200);
+  });
+
+  //edit product
+  static updateProduct = BaseController.asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const { data } = req.body;
+    BaseController.validateRequest(productUpdateValidation, {
+      id,
+      data,
+    });
+    const result = await ProductService.updateProduct(validateData);
+    BaseController.logAction("PRODUCT_UPDATE", result);
+    BaseController.sendSuccess(res, "Product updated successfully", 200);
   });
 }
 

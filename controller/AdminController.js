@@ -1,18 +1,14 @@
 const AdminService = require("../services/adminService");
-const {
-  dashboardValidation,
-  couponValidation,
-} = require("../utils/validation");
+const { couponValidation, validateId } = require("../validation/paginationValidation");
 const BaseController = require("./BaseController");
 
 class AdminController extends BaseController {
-  
   //dashboard data
   static dashboard = BaseController.asyncHandler(async (req, res) => {
     const dashboardData = req.body;
 
     const validatedData = BaseController.validateRequest(
-      dashboardValidation,
+      validateId,
       dashboardData,
     );
     const result = await AdminService.dashboardFetch(validatedData);
