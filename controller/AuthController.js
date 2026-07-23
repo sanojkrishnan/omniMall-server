@@ -1,17 +1,19 @@
 const { OAuth2Client } = require("google-auth-library");
 const AuthService = require("../services/authService");
-const {
-  registerValidation,
-  loginValidation,
-  otpValidation,
-  resetPasswordValidation,
-  googleAuthValidation,
-  googleProfileCompletionValidation,
-  resendOTPValidation,
-  isCallForSeller,
-} = require("../utils/validation");
 const BaseController = require("./BaseController");
 const config = require("../config/config");
+const {
+  registerValidation,
+  resendOTPValidation,
+  otpValidation,
+  loginValidation,
+  resetPasswordValidation,
+  emailValidation,
+} = require("../validation/authValidation");
+const {
+  googleAuthValidation,
+  googleProfileCompletionValidation,
+} = require("../validation/googleValidation");
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 class AuthController extends BaseController {
@@ -51,13 +53,9 @@ class AuthController extends BaseController {
 
   //resent OTP controller
   static resendOTP = BaseController.asyncHandler(async (req, res) => {
-    const data = req.body;
+    const email = req.body;
 
-    console.log("resend otp data", data);
-    const validateData = BaseController.validateRequest(
-      resendOTPValidation,
-      data,
-    );
+    const validateData = BaseController.validateRequest(emailValidation, email);
     const result = await AuthService.resendOTP(validateData);
 
     BaseController.sendSuccess(res, "OTP resent successfully", result, 200);
@@ -92,7 +90,10 @@ class AuthController extends BaseController {
   // forgot password controller
   static forgotPassword = BaseController.asyncHandler(async (req, res) => {
     const { email } = req.body;
-    const result = await AuthService.forgotPassword(email);
+
+    const validateData = BaseController.validateRequest(emailValidation, email);
+
+    const result = await AuthService.forgotPassword(validateData);
     BaseController.sendSuccess(res, result.message, null, 200);
   });
   // reset password controller

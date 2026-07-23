@@ -1,11 +1,11 @@
 const ProductService = require("../services/productService");
-const {
-  paginationValidation,
-  productValidation,
-  validateId,
-  updateCartQuantityValidation,
-} = require("../validation/commonValidation");
 const BaseController = require("./BaseController");
+const productValidation = require("../validation/productValidation");
+const { paginationValidation } = require("../validation/paginationValidation");
+const {
+  validateId,
+  updateValidation,
+} = require("../validation/validationHelper");
 
 class ProductController extends BaseController {
   // add product
@@ -102,6 +102,7 @@ class ProductController extends BaseController {
   static updateProduct = BaseController.asyncHandler(async (req, res) => {
     const { id } = req.params;
     const { data } = req.body;
+
     BaseController.validateRequest(productUpdateValidation, {
       id,
       data,

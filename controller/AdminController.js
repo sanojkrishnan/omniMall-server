@@ -1,5 +1,5 @@
 const AdminService = require("../services/adminService");
-const { couponValidation, validateId } = require("../validation/paginationValidation");
+const { validateId } = require("../validation/validationHelper");
 const BaseController = require("./BaseController");
 
 class AdminController extends BaseController {
@@ -20,7 +20,7 @@ class AdminController extends BaseController {
   //coupon fetch for admin
   static coupon = BaseController.asyncHandler(async (req, res) => {
     const { page, limit, search, sort } = req.query;
-    const adminId = req.admin.id;
+    const id = req.admin.id;
 
     const validatedData = BaseController.validateRequest(
       couponValidation,
@@ -28,7 +28,7 @@ class AdminController extends BaseController {
       limit,
       search,
       sort,
-      adminId,
+      id,
     );
 
     const result = await AdminService.couponFetch(validatedData);

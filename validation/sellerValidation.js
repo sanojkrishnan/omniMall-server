@@ -17,3 +17,7 @@ const isCallForSeller = Joi.object({
     .default(15)
     .messages(customMessages),
 });
+
+module.exports = {
+  isCallForSeller,
+};

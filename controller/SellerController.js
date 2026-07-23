@@ -1,6 +1,7 @@
 const AuthService = require("../services/authService");
-const { isCallForSeller } = require("../utils/validation");
 const BaseController = require("./BaseController");
+const isCallForSeller = require("../validation/sellerValidation");
+const { validateId } = require("../validation/validationHelper");
 
 class SellerController extends BaseController {
   //fetch all sellers
@@ -30,7 +31,9 @@ class SellerController extends BaseController {
   static fetchSingleSeller = BaseController.asyncHandler(async (req, res) => {
     const { id } = req.params;
     console.log("SELLER ID :", id);
-    const result = await AuthService.fetchOneSeller(id);
+
+    const validatedData = BaseController.validateRequest(validateId, id);
+    const result = await AuthService.fetchOneSeller(validatedData);
     BaseController.logAction("SINGLE_SELLER_FETCH", result);
 
     BaseController.sendSuccess(

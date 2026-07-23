@@ -28,3 +28,8 @@ const googleAuthValidation = Joi.object({
     .default("incomplete")
     .messages(customMessages),
 });
+
+module.exports = {
+  googleProfileCompletionValidation,
+  googleAuthValidation,
+};
