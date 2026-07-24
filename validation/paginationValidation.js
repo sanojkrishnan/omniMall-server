@@ -1,5 +1,5 @@
 const Joi = require("joi");
-const { customMessages } = require("./validationHelper");
+const { customMessages } = require("./commonMessages");
 
 //pagination validation schema
 const paginationValidation = Joi.object({
@@ -19,7 +19,7 @@ const paginationValidation = Joi.object({
     .optional()
     .messages(customMessages),
 
-  // Category filter — must be a valid ObjectId if provided
+  // Category filter (name/slug, not an ObjectId)
   category: Joi.string()
     .trim()
     .max(100)
@@ -31,7 +31,7 @@ const paginationValidation = Joi.object({
   minPrice: Joi.number().min(0).optional().messages(customMessages),
   maxPrice: Joi.number().min(0).optional().messages(customMessages),
   isFeatured: Joi.boolean().optional().messages(customMessages),
-  ids: Joi.string().allow("").optional(),
+  ids: Joi.string().allow("").optional().messages(customMessages),
   // Sort
   sort: Joi.string()
     .valid("price_asc", "price_desc", "newest", "oldest")

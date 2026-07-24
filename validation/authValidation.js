@@ -20,7 +20,7 @@ const strongPasswordValidation = Joi.string()
 
 //otp validation schema
 const otpValidation = Joi.object({
-  email: emailValidation,
+  email: commonPatterns.email.messages(customMessages),
   otp: Joi.string().length(6).required().messages(customMessages),
 });
 
@@ -29,7 +29,7 @@ const otpValidation = Joi.object({
 // strength is enforced at registration time, login only needs to confirm a
 // password was submitted.
 const loginValidation = Joi.object({
-  email: emailValidation,
+  email: commonPatterns.email.messages(customMessages),
   password: Joi.string().required().messages(customMessages),
 });
 
@@ -43,7 +43,7 @@ const resetPasswordValidation = Joi.object({
 const registerValidation = Joi.object({
   firstName: commonPatterns.firstName.messages(customMessages),
   lastName: commonPatterns.lastName.messages(customMessages),
-  email: emailValidation,
+  email: commonPatterns.email.messages(customMessages),
   password: strongPasswordValidation,
   role: commonPatterns.role.messages(customMessages),
   dateOfBirth: commonPatterns.dateOfBirth.messages(customMessages),

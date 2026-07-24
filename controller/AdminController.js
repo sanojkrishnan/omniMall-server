@@ -1,4 +1,5 @@
 const AdminService = require("../services/adminService");
+const { couponValidation } = require("../validation/couponValidation");
 const { validateId } = require("../validation/validationHelper");
 const BaseController = require("./BaseController");
 
@@ -22,14 +23,13 @@ class AdminController extends BaseController {
     const { page, limit, search, sort } = req.query;
     const id = req.admin.id;
 
-    const validatedData = BaseController.validateRequest(
-      couponValidation,
+    const validatedData = BaseController.validateRequest(couponValidation, {
       page,
       limit,
       search,
       sort,
       id,
-    );
+    });
 
     const result = await AdminService.couponFetch(validatedData);
     BaseController.sendSuccess(res, result, 201);

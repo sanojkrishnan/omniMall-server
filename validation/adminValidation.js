@@ -1,5 +1,6 @@
 const Joi = require("joi");
-const { loginValidation } = require("./authValidation");
+const { commonPatterns, customMessages } = require("./validationHelper");
+const { loginValidation, strongPasswordValidation } = require("./authValidation");
 
 //admin create validation schema
 const adminCreateValidation = Joi.object({

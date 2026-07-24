@@ -1,9 +1,6 @@
 const CouponService = require("../services/CouponService");
-const {
-  paginationValidation,
-  couponValidation,
-  singleCouponFetchValidation,
-} = require("../utils/validation");
+const { paginationValidation } = require("../validation/paginationValidation");
+const { validateId } = require("../validation/validationHelper");
 const BaseController = require("./BaseController");
 
 class CouponController extends BaseController {
@@ -27,12 +24,9 @@ class CouponController extends BaseController {
 
   //single coupon fetch
   static singleCouponFetch = BaseController.asyncHandler(async (req, res) => {
-    const couponId = req.params.id;
+    const Id = req.params.id;
 
-    const validatedData = BaseController.validateRequest(
-      singleCouponFetchValidation,
-      { couponId },
-    );
+    const validatedData = BaseController.validateRequest(validateId, couponId);
 
     const result = await CouponService.singleCouponFetch(
       validatedData.couponId,

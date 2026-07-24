@@ -1,11 +1,11 @@
 const CartService = require("../services/cartService");
+const BaseController = require("./BaseController");
 const {
   isCallForCart,
   addCartValidation,
   removeCartValidation,
   updateCartQuantityValidation,
-} = require("../utils/validation");
-const BaseController = require("./BaseController");
+} = require("../validation/cartValidation");
 
 class CartController extends BaseController {
   static fetchCart = BaseController.asyncHandler(async (req, res) => {
