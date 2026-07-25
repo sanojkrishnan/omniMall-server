@@ -23,13 +23,13 @@ class AdminService {
     }
   }
   //coupon fetch
-  static async couponFetch(
+  static async couponFetch({
     page = 1,
     limit = 15,
     search = "",
     sort = "newest",
-    adminId,
-  ) {
+    id: adminId,
+  }) {
     try {
       const user = await User.findById(adminId);
 

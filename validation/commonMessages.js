@@ -1,3 +1,5 @@
+const Joi = require("joi");
+
 const customMessages = {
   "string.min": "{#label} must be at least {#limit} characters long",
   "string.max": "{#label} cannot exceed {#limit} characters",
@@ -16,4 +18,23 @@ const customMessages = {
   "array.max": "{#label} cannot contain more than {#limit} item(s)",
 };
 
-module.exports = { customMessages };
+const commonPatterns = {
+  firstName: Joi.string().min(2).max(100).trim().required(),
+  lastName: Joi.string().min(2).max(100).trim().required(),
+  email: Joi.string().email().lowercase().trim().required(),
+  objectId: Joi.string().regex(/^[0-9a-fA-F]{24}$/),
+  dateOfBirth: Joi.date().required(),
+  profileImage: Joi.object({
+    url: Joi.string().uri(),
+    publicId: Joi.string(),
+  }).optional(),
+  gender: Joi.string().valid("male", "female", "other").required(),
+  status: Joi.string().valid("active", "banned", "inactive").default("active"),
+  role: Joi.string().valid("user", "seller", "admin").default("user"),
+  isVerified: Joi.boolean().default(false),
+  profileId: Joi.string()
+    .regex(/^[0-9a-fA-F]{24}$/)
+    .required(),
+};
+
+module.exports = { customMessages, commonPatterns };

@@ -34,7 +34,7 @@ const paginationValidation = Joi.object({
   ids: Joi.string().allow("").optional().messages(customMessages),
   // Sort
   sort: Joi.string()
-    .valid("price_asc", "price_desc", "newest", "oldest")
+    .valid("newest", "oldest")
     .default("newest")
     .optional()
     .messages(customMessages),

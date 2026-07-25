@@ -1,8 +1,7 @@
 const logger = require("../utils/logger");
 const Product = require("../models/Product");
 const Category = require("../models/Category");
-const { NotFoundError } = require("../utils/errors");
-const { default: mongoose } = require("mongoose");
+const mongoose = require("mongoose");
 
 class ProductService {
   static async addProduct(productData) {
@@ -222,18 +221,17 @@ class ProductService {
   }
   //delete product
   static async deleteProduct(productId) {
-    const product = await Product.findByIdAndDelete(productId);
-
-    if (!product) {
-      throw new Error("Product not found");
+    try {
+      const product = await Product.findByIdAndDelete(productId);
+      if (!product) {
+        throw new Error("Product not found");
+      }
+      logger.info("Product deleted:", productId);
+      return product;
+    } catch (error) {
+      logger.error("Delete product error:", error);
+      throw error;
     }
-
-    logger.info("Product deleted:", productId);
-    return product;
-  }
-  catch(error) {
-    logger.error("Delete product error:", error);
-    throw error;
   }
   //update product
   static async updateProduct({ data, id }) {

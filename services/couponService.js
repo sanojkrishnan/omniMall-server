@@ -1,7 +1,7 @@
 const logger = require("../utils/logger");
 const Product = require("../models/Product");
 const User = require("../models/User");
-const { AuthenticationError, NotFoundError } = require("../utils/errors");
+const { NotFoundError } = require("../utils/errors");
 const Coupon = require("../models/Coupon");
 
 const COUPON_SORT_MAP = {
@@ -13,13 +13,13 @@ const COUPON_SORT_MAP = {
 
 class CouponService {
   //coupon fetch
-  static async couponFetch(
+  static async couponFetch({
     page = 1,
     limit = 15,
     search = "",
     sort = "newest",
     adminId,
-  ) {
+  }) {
     try {
       const query = {};
 

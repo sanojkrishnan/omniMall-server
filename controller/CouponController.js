@@ -1,4 +1,4 @@
-const CouponService = require("../services/CouponService");
+const CouponService = require("../services/couponService");
 const { paginationValidation } = require("../validation/paginationValidation");
 const { validateId } = require("../validation/validationHelper");
 const BaseController = require("./BaseController");
@@ -24,13 +24,11 @@ class CouponController extends BaseController {
 
   //single coupon fetch
   static singleCouponFetch = BaseController.asyncHandler(async (req, res) => {
-    const Id = req.params.id;
+    const id = req.params.id;
 
-    const validatedData = BaseController.validateRequest(validateId, couponId);
+    const validatedData = BaseController.validateRequest(validateId, { id });
 
-    const result = await CouponService.singleCouponFetch(
-      validatedData.couponId,
-    );
+    const result = await CouponService.singleCouponFetch(validatedData.id);
     BaseController.sendSuccess(res, "Coupon fetch completed", result, 200);
   });
 }

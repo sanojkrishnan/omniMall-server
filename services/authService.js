@@ -126,7 +126,7 @@ class AuthService {
         user.otpLastSentAt &&
         Date.now() - user.otpLastSentAt.getTime() < 30 * 1000
       ) {
-        throw new BadRequestError(
+        throw new AuthenticationError(
           "Please wait 30 seconds before requesting another OTP",
         );
       }
@@ -276,7 +276,7 @@ class AuthService {
   }
   //forgot password - generate token, save to user, send email with reset link
   // AuthService.js - replace forgotPassword
-  static async forgotPassword(email) {
+  static async forgotPassword({ email }) {
     try {
       const user = await User.findByEmail(email);
       if (!user) throw new NotFoundError("User not found");

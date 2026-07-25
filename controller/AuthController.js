@@ -4,7 +4,6 @@ const BaseController = require("./BaseController");
 const config = require("../config/config");
 const {
   registerValidation,
-  resendOTPValidation,
   otpValidation,
   loginValidation,
   resetPasswordValidation,
@@ -24,7 +23,7 @@ class AuthController extends BaseController {
       lastName: req.body.lastName,
       email: req.body.email,
       password: req.body.password,
-      role: req.body.role || "user",
+      role: "user",
       dateOfBirth: req.body.dateOfBirth,
       gender: req.body.gender,
     };
@@ -91,7 +90,9 @@ class AuthController extends BaseController {
   static forgotPassword = BaseController.asyncHandler(async (req, res) => {
     const { email } = req.body;
 
-    const validateData = BaseController.validateRequest(emailValidation, email);
+    const validateData = BaseController.validateRequest(emailValidation, {
+      email,
+    });
 
     const result = await AuthService.forgotPassword(validateData);
     BaseController.sendSuccess(res, result.message, null, 200);

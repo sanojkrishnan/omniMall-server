@@ -6,12 +6,9 @@ const BaseController = require("./BaseController");
 class AdminController extends BaseController {
   //dashboard data
   static dashboard = BaseController.asyncHandler(async (req, res) => {
-    const dashboardData = req.body;
+    const id = req.admin.id;
 
-    const validatedData = BaseController.validateRequest(
-      validateId,
-      dashboardData,
-    );
+    const validatedData = BaseController.validateRequest(validateId, { id });
     const result = await AdminService.dashboardFetch(validatedData);
     BaseController.logAction("USER_REGISTER", result.user);
 

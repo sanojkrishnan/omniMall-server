@@ -1,6 +1,9 @@
 const ProductService = require("../services/productService");
 const BaseController = require("./BaseController");
-const productValidation = require("../validation/productValidation");
+const {
+  productValidation,
+  productUpdateValidation,
+} = require("../validation/productValidation");
 const { paginationValidation } = require("../validation/paginationValidation");
 const {
   validateId,
@@ -75,8 +78,9 @@ class ProductController extends BaseController {
   static fetchSingleProduct = BaseController.asyncHandler(async (req, res) => {
     const { id } = req.params;
 
-    const validateData = BaseController.validateRequest(validateId, id);
-    const result = await ProductService.fetchOneProduct(validateData);
+    const validateData = BaseController.validateRequest(validateId, { id });
+
+    const result = await ProductService.fetchOneProduct(validateData.id);
     BaseController.logAction("SINGLE_PRODUCT_FETCH", result);
 
     BaseController.sendSuccess(
@@ -91,8 +95,8 @@ class ProductController extends BaseController {
   static deleteProduct = BaseController.asyncHandler(async (req, res) => {
     const { id } = req.params;
 
-    const validateData = BaseController.validateRequest(validateId, id);
-    const result = await ProductService.deleteProduct(validateData);
+    const validateData = BaseController.validateRequest(validateId, { id });
+    const result = await ProductService.deleteProduct(validateData.id);
     BaseController.logAction("PRODUCT_DELETED", result);
 
     BaseController.sendSuccess(res, "Product deleted successfully", 200);
@@ -103,10 +107,13 @@ class ProductController extends BaseController {
     const { id } = req.params;
     const { data } = req.body;
 
-    BaseController.validateRequest(productUpdateValidation, {
-      id,
-      data,
-    });
+    const validateData = BaseController.validateRequest(
+      productUpdateValidation,
+      {
+        id,
+        data,
+      },
+    );
     const result = await ProductService.updateProduct(validateData);
     BaseController.logAction("PRODUCT_UPDATE", result);
     BaseController.sendSuccess(res, "Product updated successfully", 200);

@@ -1,5 +1,5 @@
 const Joi = require("joi");
-const { commonPatterns, customMessages } = require("./validationHelper");
+const { commonPatterns, customMessages } = require("./commonMessages");
 
 //call for categories
 const isCallForCategory = Joi.object({

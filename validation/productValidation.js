@@ -1,9 +1,6 @@
 const Joi = require("joi");
-const {
-  commonPatterns,
-  customMessages,
-  updateValidation,
-} = require("./validationHelper");
+const { updateValidation } = require("./validationHelper");
+const { customMessages, commonPatterns } = require("./commonMessages");
 
 //product validation
 const productValidation = Joi.object({

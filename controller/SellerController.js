@@ -1,6 +1,6 @@
 const AuthService = require("../services/authService");
 const BaseController = require("./BaseController");
-const isCallForSeller = require("../validation/sellerValidation");
+const { isCallForSeller } = require("../validation/sellerValidation");
 const { validateId } = require("../validation/validationHelper");
 
 class SellerController extends BaseController {
@@ -32,8 +32,8 @@ class SellerController extends BaseController {
     const { id } = req.params;
     console.log("SELLER ID :", id);
 
-    const validatedData = BaseController.validateRequest(validateId, id);
-    const result = await AuthService.fetchOneSeller(validatedData);
+    const validatedData = BaseController.validateRequest(validateId, { id });
+    const result = await AuthService.fetchOneSeller(validatedData.id);
     BaseController.logAction("SINGLE_SELLER_FETCH", result);
 
     BaseController.sendSuccess(

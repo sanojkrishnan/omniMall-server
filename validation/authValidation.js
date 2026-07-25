@@ -1,5 +1,5 @@
 const Joi = require("joi");
-const { commonPatterns, customMessages } = require("./validationHelper");
+const { commonPatterns, customMessages } = require("./commonMessages");
 
 //email validation
 const emailValidation = Joi.object({

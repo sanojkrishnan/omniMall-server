@@ -1,6 +1,6 @@
 const CategoryService = require("../services/categoryService");
 const BaseController = require("./BaseController");
-const isCallForCategory = require("../validation/categoryValidation");
+const { isCallForCategory } = require("../validation/categoryValidation");
 const { validateId } = require("../validation/validationHelper");
 
 class CategoryController extends BaseController {
@@ -30,7 +30,7 @@ class CategoryController extends BaseController {
   static fetchSingleCategory = BaseController.asyncHandler(async (req, res) => {
     const { id } = req.params;
 
-    const validatedData = BaseController.validateRequest(validateId, id);
+    const validatedData = BaseController.validateRequest(validateId, { id });
 
     const result = await CategoryService.fetchOneCategory(id);
     BaseController.logAction("SINGLE_CATEGORY_FETCH", result);

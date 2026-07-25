@@ -1,5 +1,5 @@
 const Joi = require("joi");
-const { commonPatterns, customMessages } = require("./validationHelper");
+const { commonPatterns, customMessages } = require("./commonMessages");
 
 //add cart validation
 const addCartValidation = Joi.object({

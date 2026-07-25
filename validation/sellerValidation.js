@@ -1,5 +1,5 @@
 const Joi = require("joi");
-const { commonPatterns, customMessages } = require("./validationHelper");
+const { customMessages, commonPatterns } = require("./commonMessages");
 
 //call for seller
 const isCallForSeller = Joi.object({
