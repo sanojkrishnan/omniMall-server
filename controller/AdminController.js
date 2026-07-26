@@ -20,13 +20,16 @@ class AdminController extends BaseController {
     const { page, limit, search, sort } = req.query;
     const id = req.admin.id;
 
-    const validatedData = BaseController.validateRequest(couponFetchValidation, {
-      page,
-      limit,
-      search,
-      sort,
-      id,
-    });
+    const validatedData = BaseController.validateRequest(
+      couponFetchValidation,
+      {
+        page,
+        limit,
+        search,
+        sort,
+        id,
+      },
+    );
 
     const result = await AdminService.couponFetch(validatedData);
     BaseController.sendSuccess(res, result, 201);
