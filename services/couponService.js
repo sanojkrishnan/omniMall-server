@@ -68,6 +68,32 @@ class CouponService {
       throw error;
     }
   }
+
+  //update coupon
+  static async updateCoupon({ data, id }) {
+    try {
+      const coupon = await Coupon.findByIdAndUpdate(
+        id,
+        {
+          $set: data,
+        },
+        {
+          new: true, // return updated document
+          runValidators: true, // apply schema validations
+        },
+      );
+
+      if (!coupon) {
+        throw new Error("Coupon not found");
+      }
+
+      logger.info("Coupon updated:", id);
+      return product;
+    } catch (error) {
+      logger.error("Update coupon error:", error);
+      throw error;
+    }
+  }
 }
 
 module.exports = CouponService;

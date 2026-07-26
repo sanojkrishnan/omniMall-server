@@ -31,6 +31,23 @@ class CouponController extends BaseController {
     const result = await CouponService.singleCouponFetch(validatedData.id);
     BaseController.sendSuccess(res, "Coupon fetch completed", result, 200);
   });
+
+  // update coupon (edit)
+  static updateCoupon = BaseController.asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const { data } = req.body;
+
+    const validateData = BaseController.validateRequest(
+      couponUpdateValidation,
+      {
+        id,
+        data,
+      },
+    );
+    const result = await CouponService.updateCoupon(validateData);
+    BaseController.logAction("PRODUCT_UPDATE", result);
+    BaseController.sendSuccess(res, "Product updated successfully", 200);
+  });
 }
 
 module.exports = CouponController;

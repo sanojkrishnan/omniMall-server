@@ -15,20 +15,29 @@ class AuthService {
   //registration
   static async register(userData) {
     try {
-      const existingUser = await User.findOne({
-        email: userData.email,
-        isVerified: true,
-        otp: { $exists: false },
-      });
+      const existingUser = await User.findOne({ email: userData.email });
 
       if (existingUser) {
-        throw new ConflictError("User with this email already exists");
-      }
+        if (existingUser.isVerified) {
+          throw new ConflictError("User with this email already exists");
+        }
 
-      await User.deleteOne({
-        email: userData.email,
-        isVerified: false,
-      });
+        // Unverified record exists — only allow overwrite if its OTP window
+        // has actually expired. Otherwise there's a live OTP already out
+        // there, so don't silently wipe it and issue a new one.
+        const otpExpired =
+          !existingUser.otpValidationExpires ||
+          new Date() > existingUser.otpValidationExpires;
+
+        if (!otpExpired) {
+          throw new ConflictError(
+            "An OTP has already been sent to this email. Please verify it, or wait for it to expire before registering again.",
+          );
+        }
+
+        // Expired + unverified — safe to remove and let a fresh attempt through
+        await User.deleteOne({ _id: existingUser._id });
+      }
 
       const otp = generateOTP();
 
@@ -43,7 +52,7 @@ class AuthService {
       } catch (emailError) {
         // rollback database record
         await User.findByIdAndDelete(tempUser._id);
-
+        logger.error("Failed to send OTP email:", emailError);
         throw new Error("Failed to send OTP email");
       }
 
