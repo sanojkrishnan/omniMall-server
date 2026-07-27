@@ -35,12 +35,14 @@ const couponValidation = Joi.object({
 
   discountValue: Joi.number().min(0).required().messages(customMessages),
 
-  maxDiscount: Joi.when("discountType", {
-    is: "percentage",
-    then: Joi.number().min(0).required(),
-    otherwise: Joi.forbidden(),
-  }).messages(customMessages),
-
+  maxDiscount: Joi.number()
+    .min(0)
+    .when("discountType", {
+      is: "percentage",
+      then: Joi.number().min(0).required(),
+      otherwise: Joi.forbidden(),
+    })
+    .messages(customMessages),
   minOrderAmount: Joi.number().min(0).required().messages(customMessages),
 
   startDate: Joi.date().required().messages(customMessages),
@@ -104,32 +106,35 @@ const couponValidation = Joi.object({
 }).messages(customMessages);
 
 const couponUpdateValidation = updateValidation(
-  couponValidation.fork(
-    [
-      "name",
-      "code",
-      "description",
-      "discountType",
-      "discountValue",
-      "maxDiscount",
-      "minOrderAmount",
-      "startDate",
-      "endDate",
-      "status",
-      "usageLimit",
-      "usagePerUser",
-      "applicableProducts",
-      "applicableCategories",
-      "excludedProducts",
-      "sellerIds",
-      "eligibleUsers",
-      "paymentMethods",
-      "stackable",
-      "autoApply",
-      "createdBy",
-    ],
-    (schema) => schema.optional(),
-  ),
+  couponValidation
+    .fork(
+      [
+        "name",
+        "code",
+        "description",
+        "discountType",
+        "discountValue",
+        "minOrderAmount",
+        "startDate",
+        "endDate",
+        "status",
+        "usageLimit",
+        "usagePerUser",
+        "applicableProducts",
+        "applicableCategories",
+        "excludedProducts",
+        "sellerIds",
+        "eligibleUsers",
+        "paymentMethods",
+        "stackable",
+        "autoApply",
+        "createdBy",
+      ],
+      (schema) => schema.optional(),
+    )
+    .keys({
+      maxDiscount: Joi.number().min(0).allow(null).optional(),
+    }),
 );
 
 module.exports = {

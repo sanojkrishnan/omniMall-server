@@ -1,6 +1,4 @@
 const logger = require("../utils/logger");
-const Product = require("../models/Product");
-const User = require("../models/User");
 const { NotFoundError } = require("../utils/errors");
 const Coupon = require("../models/Coupon");
 
@@ -88,7 +86,7 @@ class CouponService {
       }
 
       logger.info("Coupon updated:", id);
-      return product;
+      return coupon;
     } catch (error) {
       logger.error("Update coupon error:", error);
       throw error;

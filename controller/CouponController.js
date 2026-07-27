@@ -1,4 +1,5 @@
 const CouponService = require("../services/couponService");
+const { couponUpdateValidation } = require("../validation/couponValidation");
 const { paginationValidation } = require("../validation/paginationValidation");
 const { validateId } = require("../validation/validationHelper");
 const BaseController = require("./BaseController");
@@ -46,7 +47,12 @@ class CouponController extends BaseController {
     );
     const result = await CouponService.updateCoupon(validateData);
     BaseController.logAction("PRODUCT_UPDATE", result);
-    BaseController.sendSuccess(res, "Product updated successfully", 200);
+    BaseController.sendSuccess(
+      res,
+      "Product updated successfully",
+      result,
+      200,
+    );
   });
 }
 
