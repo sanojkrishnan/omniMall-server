@@ -92,6 +92,21 @@ class CouponService {
       throw error;
     }
   }
+
+  //delete coupon
+  static async deleteCoupon(couponId) {
+    try {
+      const coupon = await Coupon.findByIdAndDelete(couponId);
+      if (!coupon) {
+        throw new Error("Coupon not found");
+      }
+      logger.info("Coupon deleted:", couponId);
+      return coupon;
+    } catch (error) {
+      logger.error("Delete coupon error:", error);
+      throw error;
+    }
+  }
 }
 
 module.exports = CouponService;

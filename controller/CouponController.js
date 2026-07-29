@@ -54,6 +54,17 @@ class CouponController extends BaseController {
       200,
     );
   });
+
+  // delete product
+  static deleteCoupon = BaseController.asyncHandler(async (req, res) => {
+    const { id } = req.params;
+
+    const validateData = BaseController.validateRequest(validateId, { id });
+    const result = await CouponService.deleteCoupon(validateData.id);
+    BaseController.logAction("COUPON_DELETED", result);
+
+    BaseController.sendSuccess(res, "Coupon deleted successfully", 200);
+  });
 }
 
 module.exports = CouponController;
