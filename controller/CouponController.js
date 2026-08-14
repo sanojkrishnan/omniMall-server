@@ -1,5 +1,8 @@
 const CouponService = require("../services/couponService");
-const { couponUpdateValidation } = require("../validation/couponValidation");
+const {
+  couponUpdateValidation,
+  updateStatusValidation,
+} = require("../validation/couponValidation");
 const { paginationValidation } = require("../validation/paginationValidation");
 const { validateId } = require("../validation/validationHelper");
 const BaseController = require("./BaseController");
@@ -46,7 +49,7 @@ class CouponController extends BaseController {
       },
     );
     const result = await CouponService.updateCoupon(validateData);
-    BaseController.logAction("PRODUCT_UPDATE", result);
+    BaseController.logAction("COUPON_UPDATE", result);
     BaseController.sendSuccess(
       res,
       "Product updated successfully",
@@ -64,6 +67,28 @@ class CouponController extends BaseController {
     BaseController.logAction("COUPON_DELETED", result);
 
     BaseController.sendSuccess(res, "Coupon deleted successfully", 200);
+  });
+
+  static updateCouponStatus = BaseController.asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body;
+    console.log("STATUS ON COUPON :", status);
+
+    const validateData = BaseController.validateRequest(
+      updateStatusValidation,
+      {
+        id,
+        status,
+      },
+    );
+    const result = await CouponService.updateCouponStatus(validateData);
+    BaseController.logAction("COUPON_STATUS_UPDATE", result);
+    BaseController.sendSuccess(
+      res,
+      "Product updated successfully",
+      result,
+      200,
+    );
   });
 }
 

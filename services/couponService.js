@@ -93,6 +93,28 @@ class CouponService {
     }
   }
 
+  //status updation
+  //status updation
+  static async updateCouponStatus({ status, id }) {
+    try {
+      const coupon = await Coupon.findByIdAndUpdate(
+        id,
+        { $set: { status } }, //wrap it in an object
+        { returnDocument: "after", runValidators: true }, // also fixes the deprecation warning
+      );
+
+      if (!coupon) {
+        throw new Error("Coupon not found");
+      }
+
+      logger.info("Coupon updated:", id);
+      return coupon;
+    } catch (error) {
+      logger.error("Update coupon error:", error);
+      throw error;
+    }
+  }
+
   //delete coupon
   static async deleteCoupon(couponId) {
     try {

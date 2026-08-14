@@ -10,6 +10,13 @@ const couponFetchValidation = Joi.object({
   sort: Joi.string().valid("newest", "oldest").default("newest"),
 }).messages(customMessages);
 
+const updateStatusValidation = Joi.object({
+  id: commonPatterns.objectId.required().messages(customMessages),
+  status: Joi.string()
+    .valid("active", "inactive", "pending")
+    .messages(customMessages),
+});
+
 const couponValidation = Joi.object({
   name: Joi.string().trim().min(3).max(100).required().messages(customMessages),
 
@@ -140,4 +147,5 @@ const couponUpdateValidation = updateValidation(
 module.exports = {
   couponFetchValidation,
   couponUpdateValidation,
+  updateStatusValidation,
 };
