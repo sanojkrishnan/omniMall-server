@@ -2,6 +2,7 @@ const CouponService = require("../services/couponService");
 const {
   couponUpdateValidation,
   updateStatusValidation,
+  couponValidation,
 } = require("../validation/couponValidation");
 const { paginationValidation } = require("../validation/paginationValidation");
 const { validateId } = require("../validation/validationHelper");
@@ -24,6 +25,20 @@ class CouponController extends BaseController {
     });
 
     BaseController.sendSuccess(res, "Coupon fetch completed", result, 201);
+  });
+
+  //add coupon
+  static addCoupon = BaseController.asyncHandler(async (req, res) => {
+    const coupon = { ...req.body, createdBy: req.admin.id };
+
+    const validatedCoupon = BaseController.validateRequest(
+      couponValidation,
+      coupon,
+    );
+
+    const result = await CouponService.addCoupon(validatedCoupon);
+
+    BaseController.sendSuccess(res, "Coupon added successfully", result, 201);
   });
 
   //single coupon fetch

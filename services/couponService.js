@@ -1,5 +1,5 @@
 const logger = require("../utils/logger");
-const { NotFoundError } = require("../utils/errors");
+const { NotFoundError, ConflictError } = require("../utils/errors");
 const Coupon = require("../models/Coupon");
 
 const COUPON_SORT_MAP = {
@@ -51,6 +51,25 @@ class CouponService {
     }
   }
 
+  //add coupon
+  static async addCoupon(couponData) {
+    try {
+      const existingCoupon = await Coupon.findOne({ code: couponData.code });
+
+      if (existingCoupon) {
+        throw new ConflictError(
+          "This coupon code already exists in the database",
+        );
+      }
+
+      const coupon = await Coupon.create(couponData);
+      return coupon;
+    } catch (error) {
+      logger.error("Add coupon error:", error);
+      throw error;
+    }
+  }
+
   //single coupon fetch
   static async singleCouponFetch(couponId) {
     try {
@@ -92,8 +111,6 @@ class CouponService {
       throw error;
     }
   }
-
-  //status updation
   //status updation
   static async updateCouponStatus({ status, id }) {
     try {

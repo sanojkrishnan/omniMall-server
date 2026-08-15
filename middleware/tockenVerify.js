@@ -30,12 +30,16 @@ const adminAuth = (req, res, next) => {
   try {
     const token = getToken(req);
 
+    console.log("RAW ADMIN TOKEN:", token);
+
     const decoded = verifyAdminToken(token);
 
     req.admin = decoded;
 
     next();
   } catch (err) {
+    console.log("ADMIN AUTH FAILED:", err.message);
+    console.log("ADMIN AUTH FAILED — full error:", err);
     return res.status(401).json({
       message: "Invalid token",
     });

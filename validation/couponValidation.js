@@ -148,4 +148,5 @@ module.exports = {
   couponFetchValidation,
   couponUpdateValidation,
   updateStatusValidation,
+  couponValidation,
 };
