@@ -123,6 +123,21 @@ const couponSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
+couponSchema.methods.computeStatus = function () {
+  const now = new Date();
+  if (now < this.startDate) return "pending";
+  if (now > this.endDate) return "inactive";
+  return "active";
+};
+
+// Only auto-derive on creation — updates (including manual toggles) should
+// not be silently overwritten by this hook.
+couponSchema.pre("save", function (next) {
+  if (this.isNew) {
+    this.status = this.computeStatus();
+  }
+});
+
 // Speeds up common "find active, non-expired coupons" queries
 couponSchema.index({ status: 1, endDate: 1 });
 

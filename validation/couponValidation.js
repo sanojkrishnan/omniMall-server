@@ -62,11 +62,6 @@ const couponValidation = Joi.object({
       "date.greater": "End date must be after start date",
     }),
 
-  status: Joi.string()
-    .valid("active", "inactive", "pending")
-    .default("pending")
-    .messages(customMessages),
-
   usageLimit: Joi.number().integer().min(1).required().messages(customMessages),
 
   usagePerUser: Joi.number()
@@ -124,7 +119,6 @@ const couponUpdateValidation = updateValidation(
         "minOrderAmount",
         "startDate",
         "endDate",
-        "status",
         "usageLimit",
         "usagePerUser",
         "applicableProducts",

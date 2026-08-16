@@ -9,6 +9,7 @@ const { runSeeders } = require("./utils/seeder");
 const config = require("./config/config");
 const { errorHandler, notFound } = require("./middleware/errorHandler");
 const DBConnect = require("./config/database");
+require("./jobs/couponStatusCron");
 
 class Server {
   constructor() {
