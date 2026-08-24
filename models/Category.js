@@ -4,20 +4,11 @@ const categorySchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      enum: {
-        values: [
-          "Electronics",
-          "Home Appliances",
-          "Beauty",
-          "Fashion",
-          "Accessories",
-          "Beverages",
-        ],
-        message: "Status must be active or inactive",
-      },
       required: [true, "Category name is required"],
       trim: true,
       unique: true,
+      minlength: [2, "Category name must be at least 2 characters"],
+      maxlength: [50, "Category name must be under 50 characters"],
     },
     categoryImage: {
       url: {
@@ -29,20 +20,9 @@ const categorySchema = new mongoose.Schema(
         required: [true, "Category image publicId is required"],
       },
     },
-    subCategories: {
-      type: [String],
-      required: [true, "Sub category is required"],
-      default: [],
-    },
-    availableColors: {
-      type: [String],
-      required: [true, "Available colors are required"],
-      default: [],
-    },
-    specSheet: {
-      type: [Object],
-      require: [true, "Spec sheet is a must"],
-      default: [],
+    isActive: {
+      type: Boolean,
+      default: true,
     },
   },
   { timestamps: true },
