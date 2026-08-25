@@ -3,12 +3,12 @@ const { default: mongoose } = require("mongoose");
 const SELLER_ID = "6a213d5a23da8241fc385b3d";
 
 const CATEGORIES = {
-  Electronics: "6a493ee8d8dca79e5dd3c9df",
-  Beauty: "6a493ee8d8dca79e5dd3c9e0",
-  HomeApp: "6a493ee8d8dca79e5dd3c9e1",
-  Fashion: "6a493ee8d8dca79e5dd3c9e2",
-  Beverages: "6a493ee8d8dca79e5dd3c9e3",
-  Accessories: "6a493ee8d8dca79e5dd3c9e4",
+  Electronics: "6a8c9e11adf0b4cb404bad57",
+  Beauty: "6a8c9e11adf0b4cb404bad59",
+  HomeApp: "6a8c9e11adf0b4cb404bad58",
+  Fashion: "6a8c9e11adf0b4cb404bad5a",
+  Beverages: "6a8c9e11adf0b4cb404bad5c",
+  Accessories: "6a8c9e11adf0b4cb404bad5b",
 };
 
 // placeholder image — valid url + publicId format the schema requires
