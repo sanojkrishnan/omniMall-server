@@ -1,6 +1,6 @@
 const CategoryService = require("../services/categoryService");
 const BaseController = require("./BaseController");
-const { isCallForCategory } = require("../validation/categoryValidation");
+const { isCallForCategory, categoryUpdateValidation } = require("../validation/categoryValidation");
 const { validateId } = require("../validation/validationHelper");
 
 class CategoryController extends BaseController {
@@ -32,7 +32,7 @@ class CategoryController extends BaseController {
 
     const validatedData = BaseController.validateRequest(validateId, { id });
 
-    const result = await CategoryService.fetchOneCategory(id);
+    const result = await CategoryService.fetchOneCategory(validatedData.id);
     BaseController.logAction("SINGLE_CATEGORY_FETCH", result);
 
     BaseController.sendSuccess(
@@ -42,6 +42,25 @@ class CategoryController extends BaseController {
       200,
     );
   });
+
+  //edit category
+  static updateCategory = BaseController.asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const { data } = req.body;
+
+    const validateData = BaseController.validateRequest(
+      categoryUpdateValidation,
+      {
+        id,
+        data,
+      },
+    );
+    const result = await CategoryService.updateCategory(validateData);
+    BaseController.logAction("PRODUCT_UPDATE", result);
+    BaseController.sendSuccess(res, "Product updated successfully", 200);
+  });
+
+  
 }
 
 module.exports = CategoryController;

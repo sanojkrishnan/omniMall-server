@@ -51,6 +51,32 @@ class CategoryService {
       throw error;
     }
   }
+
+  //update category
+  static async updateCategory({ data, id }) {
+    try {
+      const category = await Category.findByIdAndUpdate(
+        id,
+        {
+          $set: data,
+        },
+        {
+          new: true, // return updated document
+          runValidators: true, // apply schema validations
+        },
+      );
+
+      if (!category) {
+        throw new NotFoundError("Category not found");
+      }
+
+      logger.info("Category updated:", id);
+      return category;
+    } catch (error) {
+      logger.error("Update category error:", error);
+      throw error;
+    }
+  }
 }
 
 module.exports = CategoryService;

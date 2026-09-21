@@ -1,5 +1,6 @@
 const Joi = require("joi");
 const { commonPatterns, customMessages } = require("./commonMessages");
+const { updateValidation } = require("./validationHelper");
 
 //call for categories
 const isCallForCategory = Joi.object({
@@ -18,6 +19,26 @@ const isCallForCategory = Joi.object({
     .messages(customMessages),
 });
 
+const categoryValidation = Joi.object({
+  name: Joi.string().required().messages(customMessages),
+  categoryImage: Joi.object({
+    url: Joi.string().uri(),
+    publicId: Joi.string(),
+  })
+    .required()
+    .messages(customMessages),
+  isActive: Joi.boolean().default(true).messages(customMessages),
+});
+
+//category update validation
+const categoryUpdateValidation = updateValidation(
+  categoryValidation.fork(["name", "categoryImage", "isActive"], (schema) =>
+    schema.optional(),
+  ),
+);
+
 module.exports = {
   isCallForCategory,
+  categoryUpdateValidation,
+  categoryValidation
 };
