@@ -90,14 +90,4 @@ productSchema.pre("save", function () {
   }
 });
 
-productSchema.pre("findOneAndUpdate", function () {
-  const update = this.getUpdate();
-
-  if (update.mrp && update.offerPrice) {
-    update.offerPercentage = Math.round(
-      ((update.mrp - update.offerPrice) / update.mrp) * 100,
-    );
-  }
-});
-
 module.exports = mongoose.model("Product", productSchema);

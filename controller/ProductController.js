@@ -1,35 +1,37 @@
 const ProductService = require("../services/productService");
 const BaseController = require("./BaseController");
+const { withCleanup } = require("../utils/cloudinaryCleanup");
+const { ValidationError } = require("../utils/errors");
 const {
   productValidation,
   productUpdateValidation,
 } = require("../validation/productValidation");
 const { paginationValidation } = require("../validation/paginationValidation");
-const {
-  validateId,
-  updateValidation,
-} = require("../validation/validationHelper");
+const { validateId } = require("../validation/validationHelper");
 
 class ProductController extends BaseController {
   // add product
   static addProduct = BaseController.asyncHandler(async (req, res) => {
-    const productInfo = req.body;
-
     if (!req.files || req.files.length === 0) {
-      throw new Error("At least one product image is required");
+      throw new ValidationError("At least one product image is required");
     }
 
-    productInfo.productImage = req.files.map((file) => ({
-      url: file.path,
-      publicId: file.filename,
-    }));
+    // if validation or the insert fails, the images multer already uploaded are removed
+    const result = await withCleanup(req.files, async () => {
+      const productInfo = {
+        ...req.body,
+        productImage: req.files.map((file) => ({
+          url: file.path,
+          publicId: file.filename,
+        })),
+      };
 
-    const validatedProduct = BaseController.validateRequest(
-      productValidation,
-      productInfo,
-    );
-
-    const result = await ProductService.addProduct(validatedProduct);
+      const validatedProduct = BaseController.validateRequest(
+        productValidation,
+        productInfo,
+      );
+      return ProductService.addProduct(validatedProduct);
+    });
 
     BaseController.sendSuccess(res, "Product added successfully", result, 201);
   });
@@ -99,13 +101,19 @@ class ProductController extends BaseController {
     const result = await ProductService.deleteProduct(validateData.id);
     BaseController.logAction("PRODUCT_DELETED", result);
 
-    BaseController.sendSuccess(res, "Product deleted successfully", 200);
+    BaseController.sendSuccess(
+      res,
+      "Product deleted successfully",
+      result,
+      200,
+    );
   });
 
-  //edit product
+  //edit product (text/price fields only, images go through the image endpoints)
   static updateProduct = BaseController.asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const { data } = req.body;
+    const data = { ...(req.body?.data ?? req.body) }; // works whether the client wraps in { data } or not
+    delete data.productImage;
 
     const validateData = BaseController.validateRequest(
       productUpdateValidation,
@@ -116,7 +124,12 @@ class ProductController extends BaseController {
     );
     const result = await ProductService.updateProduct(validateData);
     BaseController.logAction("PRODUCT_UPDATE", result);
-    BaseController.sendSuccess(res, "Product updated successfully", 200);
+    BaseController.sendSuccess(
+      res,
+      "Product updated successfully",
+      result,
+      200,
+    );
   });
 }
 

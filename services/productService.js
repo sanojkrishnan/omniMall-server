@@ -226,6 +226,10 @@ class ProductService {
       if (!product) {
         throw new Error("Product not found");
       }
+      // remove its images from Cloudinary too, otherwise they are orphaned
+      await Promise.all(
+        product.productImage.map((i) => safeDestroy(i.publicId)),
+      );
       logger.info("Product deleted:", productId);
       return product;
     } catch (error) {
@@ -236,11 +240,33 @@ class ProductService {
   //update product
   static async updateProduct({ data, id }) {
     try {
+      const update = { ...data };
+      delete update.productImage; // images change only through the image endpoints
+      if (update.couponId === "") update.couponId = null; // form sends "" for "no coupon"
+
+      // mrp / offerPrice depend on each other, and Mongoose update validators
+      // can't see the rest of the document, so check and derive here.
+      if (update.mrp !== undefined || update.offerPrice !== undefined) {
+        const current = await Product.findById(id)
+          .select("mrp offerPrice")
+          .lean();
+        if (!current) {
+          throw new Error("Product not found");
+        }
+        const mrp = update.mrp ?? current.mrp;
+        const offerPrice = update.offerPrice ?? current.offerPrice;
+
+        if (offerPrice > mrp) {
+          throw new ValidationError(
+            "Offer price must be less than or equal to MRP",
+          );
+        }
+        update.offerPercentage = Math.round(((mrp - offerPrice) / mrp) * 100);
+      }
+
       const product = await Product.findByIdAndUpdate(
         id,
-        {
-          $set: data,
-        },
+        { $set: update },
         {
           new: true, // return updated document
           runValidators: true, // apply schema validations

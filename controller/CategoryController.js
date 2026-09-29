@@ -1,7 +1,11 @@
 const CategoryService = require("../services/categoryService");
 const BaseController = require("./BaseController");
-const { isCallForCategory, categoryUpdateValidation } = require("../validation/categoryValidation");
+const {
+  isCallForCategory,
+  categoryUpdateValidation,
+} = require("../validation/categoryValidation");
 const { validateId } = require("../validation/validationHelper");
+const { ValidationError } = require("../utils/errors");
 
 class CategoryController extends BaseController {
   static findProductCategory = BaseController.asyncHandler(async (req, res) => {
@@ -48,6 +52,15 @@ class CategoryController extends BaseController {
     const { id } = req.params;
     const { data } = req.body;
 
+    // if (!req.files || req.files.length === 0) {
+    //   throw new ValidationError("Category image is required");
+    // }
+
+    // categoryInfo.categoryImage = req.files.map((file) => ({
+    //   url: file.path,
+    //   publicId: file.filename,
+    // }));
+
     const validateData = BaseController.validateRequest(
       categoryUpdateValidation,
       {
@@ -56,11 +69,9 @@ class CategoryController extends BaseController {
       },
     );
     const result = await CategoryService.updateCategory(validateData);
-    BaseController.logAction("PRODUCT_UPDATE", result);
-    BaseController.sendSuccess(res, "Product updated successfully", 200);
+    BaseController.logAction("CATEGORY_UPDATE", result);
+    BaseController.sendSuccess(res, "Category updated successfully", 200);
   });
-
-  
 }
 
 module.exports = CategoryController;
