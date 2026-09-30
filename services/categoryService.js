@@ -1,4 +1,7 @@
 const Category = require("../models/Category");
+const Product = require("../models/Product");
+const { safeDestroy } = require("../utils/cloudinaryCleanup");
+const { NotFoundError, ValidationError } = require("../utils/errors");
 const logger = require("../utils/logger");
 
 class CategoryService {
@@ -55,25 +58,53 @@ class CategoryService {
   //update category
   static async updateCategory({ data, id }) {
     try {
+      const existing = await Category.findById(id).select("categoryImage");
+      if (!existing) throw new NotFoundError("Category not found");
+
       const category = await Category.findByIdAndUpdate(
         id,
-        {
-          $set: data,
-        },
-        {
-          new: true, // return updated document
-          runValidators: true, // apply schema validations
-        },
+        { $set: data },
+        { new: true, runValidators: true },
       );
 
-      if (!category) {
-        throw new NotFoundError("Category not found");
+      // old image is removed only after the DB update succeeded
+      const oldId = existing.categoryImage?.publicId;
+      if (
+        data.categoryImage &&
+        oldId &&
+        oldId !== data.categoryImage.publicId
+      ) {
+        await safeDestroy(oldId);
       }
 
+      const categoryReturn = await Category.findById(id);
       logger.info("Category updated:", id);
-      return category;
+      return categoryReturn;
     } catch (error) {
       logger.error("Update category error:", error);
+      throw error;
+    }
+  }
+
+  //delete category
+  static async deleteCategory(categoryId) {
+    try {
+      const inUse = await Product.exists({ categoryId: categoryId }); // use your real field name
+      if (inUse) {
+        throw new ValidationError(
+          "This category has products. Move or delete them first.",
+        );
+      }
+      const category = await Category.findByIdAndDelete(categoryId);
+      if (!category) throw new NotFoundError("Category not found");
+
+      // DB delete succeeded, so now remove the image (safeDestroy never throws)
+      await safeDestroy(category.categoryImage?.publicId);
+
+      logger.info("Category deleted:", categoryId);
+      return category;
+    } catch (error) {
+      logger.error("Delete category error:", error);
       throw error;
     }
   }

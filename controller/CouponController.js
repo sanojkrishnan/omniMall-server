@@ -81,7 +81,7 @@ class CouponController extends BaseController {
     const result = await CouponService.deleteCoupon(validateData.id);
     BaseController.logAction("COUPON_DELETED", result);
 
-    BaseController.sendSuccess(res, "Coupon deleted successfully", 200);
+    BaseController.sendSuccess(res, "Coupon deleted successfully", result, 200);
   });
 
   static updateCouponStatus = BaseController.asyncHandler(async (req, res) => {

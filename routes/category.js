@@ -3,8 +3,8 @@ const {
   findProductCategory,
   fetchSingleCategory,
   updateCategory,
+  deleteCategory,
 } = require("../controller/CategoryController");
-const { saveCategoryImage } = require("../controller/ImageController");
 const { uploadCategoryImage } = require("../config/cloudinary");
 const router = express.Router();
 
@@ -13,8 +13,8 @@ router.get("/fetch-single/:id", fetchSingleCategory);
 router.patch(
   "/update/:id",
   uploadCategoryImage.single("categoryImage"),
-  saveCategoryImage,
   updateCategory,
 );
+router.delete("/delete/:id", deleteCategory);
 
 module.exports = router;

@@ -11,6 +11,8 @@ const sampleCategories = [
   { name: "Fashion", isActive: true },
   { name: "Accessories", isActive: false },
   { name: "Beverages", isActive: true },
+  { name: "Beverage", isActive: true },
+  { name: "Beverag", isActive: true },
 ];
 
 const categoryDocs = sampleCategories.map((item) => ({

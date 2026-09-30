@@ -1,7 +1,10 @@
-// controllers/userController.js
+// controllers/imageController.js
 const { cloudinary } = require("../config/cloudinary");
 const Category = require("../models/Category");
 const User = require("../models/User");
+const mongoose = require("mongoose");
+const Product = require("../models/Product");
+const { safeDestroy, cleanupFiles } = require("../utils/cloudinaryCleanup");
 
 const MAX_PRODUCT_IMAGES = 10;
 const toImage = (file) => ({ url: file.path, publicId: file.filename });
