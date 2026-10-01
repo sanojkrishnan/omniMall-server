@@ -93,22 +93,6 @@ class ProductController extends BaseController {
     );
   });
 
-  // delete product
-  static deleteProduct = BaseController.asyncHandler(async (req, res) => {
-    const { id } = req.params;
-
-    const validateData = BaseController.validateRequest(validateId, { id });
-    const result = await ProductService.deleteProduct(validateData.id);
-    BaseController.logAction("PRODUCT_DELETED", result);
-
-    BaseController.sendSuccess(
-      res,
-      "Product deleted successfully",
-      result,
-      200,
-    );
-  });
-
   //edit product (text/price fields only, images go through the image endpoints)
   static updateProduct = BaseController.asyncHandler(async (req, res) => {
     const { id } = req.params;

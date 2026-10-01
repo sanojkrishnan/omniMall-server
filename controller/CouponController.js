@@ -27,20 +27,6 @@ class CouponController extends BaseController {
     BaseController.sendSuccess(res, "Coupon fetch completed", result, 201);
   });
 
-  //add coupon
-  static addCoupon = BaseController.asyncHandler(async (req, res) => {
-    const coupon = { ...req.body, createdBy: req.admin.id };
-
-    const validatedCoupon = BaseController.validateRequest(
-      couponValidation,
-      coupon,
-    );
-
-    const result = await CouponService.addCoupon(validatedCoupon);
-
-    BaseController.sendSuccess(res, "Coupon added successfully", result, 201);
-  });
-
   //single coupon fetch
   static singleCouponFetch = BaseController.asyncHandler(async (req, res) => {
     const id = req.params.id;
@@ -49,61 +35,6 @@ class CouponController extends BaseController {
 
     const result = await CouponService.singleCouponFetch(validatedData.id);
     BaseController.sendSuccess(res, "Coupon fetch completed", result, 200);
-  });
-
-  // update coupon (edit)
-  static updateCoupon = BaseController.asyncHandler(async (req, res) => {
-    const { id } = req.params;
-    const { data } = req.body;
-
-    const validateData = BaseController.validateRequest(
-      couponUpdateValidation,
-      {
-        id,
-        data,
-      },
-    );
-    const result = await CouponService.updateCoupon(validateData);
-    BaseController.logAction("COUPON_UPDATE", result);
-    BaseController.sendSuccess(
-      res,
-      "Product updated successfully",
-      result,
-      200,
-    );
-  });
-
-  // delete product
-  static deleteCoupon = BaseController.asyncHandler(async (req, res) => {
-    const { id } = req.params;
-
-    const validateData = BaseController.validateRequest(validateId, { id });
-    const result = await CouponService.deleteCoupon(validateData.id);
-    BaseController.logAction("COUPON_DELETED", result);
-
-    BaseController.sendSuccess(res, "Coupon deleted successfully", result, 200);
-  });
-
-  static updateCouponStatus = BaseController.asyncHandler(async (req, res) => {
-    const { id } = req.params;
-    const { status } = req.body;
-    console.log("STATUS ON COUPON :", status);
-
-    const validateData = BaseController.validateRequest(
-      updateStatusValidation,
-      {
-        id,
-        status,
-      },
-    );
-    const result = await CouponService.updateCouponStatus(validateData);
-    BaseController.logAction("COUPON_STATUS_UPDATE", result);
-    BaseController.sendSuccess(
-      res,
-      "Product updated successfully",
-      result,
-      200,
-    );
   });
 }
 

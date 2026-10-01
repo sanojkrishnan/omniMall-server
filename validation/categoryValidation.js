@@ -20,10 +20,10 @@ const isCallForCategory = Joi.object({
 });
 
 const categoryValidation = Joi.object({
-  name: Joi.string().required().messages(customMessages),
+  name: Joi.string().trim().min(2).max(60).required().messages(customMessages),
   categoryImage: Joi.object({
-    url: Joi.string().uri(),
-    publicId: Joi.string(),
+    url: Joi.string().uri().required(),
+    publicId: Joi.string().required(),
   })
     .required()
     .messages(customMessages),
@@ -40,5 +40,5 @@ const categoryUpdateValidation = updateValidation(
 module.exports = {
   isCallForCategory,
   categoryUpdateValidation,
-  categoryValidation
+  categoryValidation,
 };

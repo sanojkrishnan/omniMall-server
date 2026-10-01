@@ -1,6 +1,5 @@
 // controllers/imageController.js
 const { cloudinary } = require("../config/cloudinary");
-const Category = require("../models/Category");
 const User = require("../models/User");
 const mongoose = require("mongoose");
 const Product = require("../models/Product");
@@ -57,34 +56,6 @@ const deleteProfileImage = async (req, res) => {
     res.status(200).json({ message: "Profile image deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: "Deletion failed", error: error.message });
-  }
-};
-
-//upload / replace category image
-const saveCategoryImage = async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ message: "No image provided" });
-    }
-
-    const category = await Category.findById(req.params.id);
-    if (!category) {
-      await cleanupFiles(req.file);
-      return res.status(404).json({ message: "Category not found" });
-    }
-
-    const oldPublicId = category.categoryImage?.publicId;
-    category.categoryImage = toImage(req.file);
-    await category.save();
-    await safeDestroy(oldPublicId); // after the save, so a failed save keeps the old image
-
-    res.status(200).json({
-      message: "Category image uploaded successfully",
-      categoryImage: category.categoryImage,
-    });
-  } catch (error) {
-    await cleanupFiles(req.file);
-    res.status(500).json({ message: "Upload failed", error: error.message });
   }
 };
 
@@ -226,7 +197,6 @@ const deleteProductImage = async (req, res) => {
 module.exports = {
   uploadProfileImage,
   deleteProfileImage,
-  saveCategoryImage,
   saveProductImages,
   changeProductImage,
   deleteProductImage,

@@ -108,6 +108,31 @@ class CategoryService {
       throw error;
     }
   }
+
+  //add category
+  static async addCategory(data) {
+    try {
+      // case-insensitive duplicate check
+      const exists = await Category.exists({ name: data.name }).collation({
+        locale: "en",
+        strength: 2,
+      });
+      if (exists) {
+        throw new ValidationError("A category with this name already exists.");
+      }
+
+      const category = await Category.create(data);
+      logger.info("Category added:", category._id);
+      return category;
+    } catch (error) {
+      // unique-index race: two requests passed the check at the same time
+      if (error?.code === 11000) {
+        throw new ValidationError("A category with this name already exists.");
+      }
+      logger.error("Add category error:", error);
+      throw error;
+    }
+  }
 }
 
 module.exports = CategoryService;
