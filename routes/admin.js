@@ -22,21 +22,21 @@ router.use(adminAuth);
 router.get("/dashboard", dashboard);
 
 //category admin access
-router.delete("/delete/:id", deleteCategory);
-router.post("/add", uploadCategoryImage.single("categoryImage"), addCategory);
+router.delete("/category/delete/:id", deleteCategory);
+router.post("/category/add", uploadCategoryImage.single("categoryImage"), addCategory);
 router.patch(
-  "/update/:id",
+  "/category/update/:id",
   uploadCategoryImage.single("categoryImage"),
   updateCategory,
 );
 
 //coupon admin access
-router.patch("/update/:id", updateCoupon);
-router.delete("/delete/:id", deleteCoupon);
-router.patch("/updateStatus/:id", updateCouponStatus);
-router.post("/add", addCoupon);
+router.patch("/coupon/update/:id", updateCoupon);
+router.delete("/coupon/delete/:id", deleteCoupon);
+router.patch("/coupon/updateStatus/:id", updateCouponStatus);
+router.post("/coupon/add", addCoupon);
 
 //product admin access
-router.delete("/delete/:id", deleteProduct); // product image deletion is in the image route
+router.delete("/product/delete/:id", deleteProduct); // product image deletion is in the image route
 
 module.exports = router;
