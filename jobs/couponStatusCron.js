@@ -2,7 +2,7 @@ const cron = require("node-cron");
 const Coupon = require("../models/Coupon");
 const logger = require("../utils/logger");
 
-async function refreshCouponStatuses() {
+async function refreshCouponStatuses() {  // Function to refresh coupon statuses based on their start and end dates
   const now = new Date();
 
   try {

@@ -1,5 +1,4 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const http = require("http");
 const logger = require("./utils/logger");
 const { setupMiddleware } = require("./middleware/setup");

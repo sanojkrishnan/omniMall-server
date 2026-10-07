@@ -32,5 +32,27 @@
     "socket.io": "^4.8.3",
     "winston": "^3.19.0",
     "winston-daily-rotate-file": "^5.0.0"
+  },
+  "_comments": {
+    "bcrypt": "Hashes passwords securely",
+    "cloudinary": "Stores and manages uploaded images/files",
+    "cors": "Allows frontend and backend to communicate across origins",
+    "dotenv": "Loads environment variables from .env",
+    "express": "Backend web framework and API server",
+    "express-rate-limit": "Limits repeated API requests",
+    "google-auth-library": "Handles Google authentication",
+    "helmet": "Adds security HTTP headers",
+    "joi": "Validates incoming data",
+    "jsonwebtoken": "Creates and verifies JWT authentication tokens",
+    "logger": "Logging utility",
+    "mongoose": "MongoDB ODM for schemas and database operations",
+    "multer": "Handles file uploads",
+    "multer-storage-cloudinary": "Connects Multer uploads to Cloudinary",
+    "node-cron": "Runs scheduled backend tasks",
+    "nodemailer": "Sends emails",
+    "nodemon": "Restarts server automatically during development",
+    "socket.io": "Provides real-time communication",
+    "winston": "Application logging system",
+    "winston-daily-rotate-file": "Creates rotating log files"
   }
 }
