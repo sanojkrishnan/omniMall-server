@@ -1,4 +1,5 @@
 const AdminService = require("../services/adminService");
+const { withCleanup } = require("../utils/cloudinaryCleanup");
 const { ValidationError } = require("../utils/errors");
 const {
   categoryValidation,
@@ -12,34 +13,45 @@ const {
 const { validateId } = require("../validation/validationHelper");
 const BaseController = require("./BaseController");
 
+// validates the admin id from the token with the shared id schema, returns the id string
+const getAdminId = (req) =>
+  BaseController.validateRequest(validateId, { id: req.admin.id }).id;
+
 class AdminController extends BaseController {
   //dashboard data
   static dashboard = BaseController.asyncHandler(async (req, res) => {
-    const id = req.admin.id;
+    const adminId = getAdminId(req);
 
-    const validatedData = BaseController.validateRequest(validateId, { id });
-    const result = await AdminService.dashboardFetch(validatedData);
-    BaseController.logAction("USER_REGISTER", result.user);
+    const result = await AdminService.dashboardFetch({ id: adminId });
+    BaseController.logAction("DASHBOARD_FETCH", null, { adminId });
 
-    BaseController.sendSuccess(res, result, 201);
+    BaseController.sendSuccess(
+      res,
+      "Dashboard fetched successfully",
+      result,
+      200,
+    );
   });
+
   //coupon controller
   //add coupon
   static addCoupon = BaseController.asyncHandler(async (req, res) => {
-    const coupon = { ...req.body, createdBy: req.admin.id };
+    const adminId = getAdminId(req);
 
-    const validatedCoupon = BaseController.validateRequest(
-      couponValidation,
-      coupon,
-    );
+    const validatedCoupon = BaseController.validateRequest(couponValidation, {
+      ...req.body,
+      createdBy: adminId,
+    });
 
-    const result = await CouponService.addCoupon(validatedCoupon);
+    const result = await AdminService.addCoupon(validatedCoupon);
+    BaseController.logAction("COUPON_ADD", result);
 
     BaseController.sendSuccess(res, "Coupon added successfully", result, 201);
   });
 
   // update coupon (edit)
   static updateCoupon = BaseController.asyncHandler(async (req, res) => {
+    const adminId = getAdminId(req);
     const { id } = req.params;
     const { data } = req.body;
 
@@ -50,32 +62,30 @@ class AdminController extends BaseController {
         data,
       },
     );
-    const result = await CouponService.updateCoupon(validateData);
+
+    const result = await AdminService.updateCoupon(validateData, adminId);
     BaseController.logAction("COUPON_UPDATE", result);
-    BaseController.sendSuccess(
-      res,
-      "Product updated successfully",
-      result,
-      200,
-    );
+
+    BaseController.sendSuccess(res, "Coupon updated successfully", result, 200);
   });
 
   // delete coupon
   static deleteCoupon = BaseController.asyncHandler(async (req, res) => {
+    const adminId = getAdminId(req);
     const { id } = req.params;
 
     const validateData = BaseController.validateRequest(validateId, { id });
-    const result = await CouponService.deleteCoupon(validateData.id);
+    const result = await AdminService.deleteCoupon(validateData.id, adminId);
     BaseController.logAction("COUPON_DELETED", result);
 
     BaseController.sendSuccess(res, "Coupon deleted successfully", result, 200);
   });
 
-  //update coupon
+  // update coupon status
   static updateCouponStatus = BaseController.asyncHandler(async (req, res) => {
+    const adminId = getAdminId(req);
     const { id } = req.params;
     const { status } = req.body;
-    console.log("STATUS ON COUPON :", status);
 
     const validateData = BaseController.validateRequest(
       updateStatusValidation,
@@ -84,11 +94,13 @@ class AdminController extends BaseController {
         status,
       },
     );
-    const result = await CouponService.updateCouponStatus(validateData);
+
+    const result = await AdminService.updateCouponStatus(validateData, adminId);
     BaseController.logAction("COUPON_STATUS_UPDATE", result);
+
     BaseController.sendSuccess(
       res,
-      "Product updated successfully",
+      "Coupon status updated successfully",
       result,
       200,
     );
@@ -97,10 +109,11 @@ class AdminController extends BaseController {
   //category controller
   // delete category
   static deleteCategory = BaseController.asyncHandler(async (req, res) => {
+    const adminId = getAdminId(req);
     const { id } = req.params;
 
     const validateData = BaseController.validateRequest(validateId, { id });
-    const result = await CategoryService.deleteCategory(validateData.id);
+    const result = await AdminService.deleteCategory(validateData.id, adminId);
     BaseController.logAction("CATEGORY_DELETED", result);
 
     BaseController.sendSuccess(
@@ -113,13 +126,13 @@ class AdminController extends BaseController {
 
   //edit category
   static updateCategory = BaseController.asyncHandler(async (req, res) => {
-    const { id } = req.params;
-
     const result = await withCleanup(req.file, async () => {
+      // inside withCleanup so a failure here still removes the uploaded image
+      const adminId = getAdminId(req);
+      const { id } = req.params;
+
       // multipart sends `data` as a JSON string; also accept flat fields or a JSON body
       let data = req.body?.data ?? req.body ?? {};
-      console.log("FILE:", req.file);
-      console.log("BODY:", req.body);
 
       if (typeof data === "string") {
         try {
@@ -146,7 +159,7 @@ class AdminController extends BaseController {
           data,
         },
       );
-      return CategoryService.updateCategory(validated);
+      return AdminService.updateCategory(validated, adminId);
     });
 
     BaseController.logAction("CATEGORY_UPDATE", result);
@@ -161,9 +174,9 @@ class AdminController extends BaseController {
   //add category
   static addCategory = BaseController.asyncHandler(async (req, res) => {
     const result = await withCleanup(req.file, async () => {
-      let data = req.body?.data ?? req.body ?? {};
+      const adminId = getAdminId(req);
 
-      console.log("CONSOLES THE ENTIRE REQUEST : ", req.body);
+      let data = req.body?.data ?? req.body ?? {};
 
       if (typeof data === "string") {
         try {
@@ -187,7 +200,7 @@ class AdminController extends BaseController {
         categoryValidation,
         data,
       );
-      return CategoryService.addCategory(validated);
+      return AdminService.addCategory(validated, adminId);
     });
 
     BaseController.logAction("CATEGORY_ADD", result);
@@ -197,10 +210,11 @@ class AdminController extends BaseController {
   //product controller
   // delete product
   static deleteProduct = BaseController.asyncHandler(async (req, res) => {
+    const adminId = getAdminId(req);
     const { id } = req.params;
 
     const validateData = BaseController.validateRequest(validateId, { id });
-    const result = await ProductService.deleteProduct(validateData.id);
+    const result = await AdminService.deleteProduct(validateData.id, adminId);
     BaseController.logAction("PRODUCT_DELETED", result);
 
     BaseController.sendSuccess(

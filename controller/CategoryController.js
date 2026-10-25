@@ -1,13 +1,7 @@
 const CategoryService = require("../services/categoryService");
 const BaseController = require("./BaseController");
-const {
-  isCallForCategory,
-  categoryUpdateValidation,
-  categoryValidation,
-} = require("../validation/categoryValidation");
+const { isCallForCategory } = require("../validation/categoryValidation");
 const { validateId } = require("../validation/validationHelper");
-const { ValidationError } = require("../utils/errors");
-const { withCleanup } = require("../utils/cloudinaryCleanup");
 
 class CategoryController extends BaseController {
   static findProductCategory = BaseController.asyncHandler(async (req, res) => {

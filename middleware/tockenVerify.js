@@ -9,6 +9,15 @@ const getToken = (req) => {
 
   return authHeader.split(" ")[1];
 };
+
+// handles every auth failure and logs the reason
+const handleAuthError = (err, res) => {
+  console.log("AUTH FAIL:", err.message);
+  return res.status(401).json({
+    message:
+      err.message === "Token expired" ? "Token expired" : "Invalid token",
+  });
+};
 // user verification
 const userAuth = (req, res, next) => {
   try {
@@ -20,9 +29,7 @@ const userAuth = (req, res, next) => {
 
     next();
   } catch (err) {
-    return res.status(401).json({
-      message: "Invalid token",
-    });
+    return handleAuthError(err, res);
   }
 };
 // admin verification
@@ -31,14 +38,13 @@ const adminAuth = (req, res, next) => {
     const token = getToken(req);
 
     const decoded = verifyAdminToken(token);
+    console.log("DECODED:", decoded);
 
     req.admin = decoded;
 
     next();
   } catch (err) {
-    return res.status(401).json({
-      message: "Invalid token",
-    });
+    return handleAuthError(err, res);
   }
 };
 
