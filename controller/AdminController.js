@@ -53,7 +53,7 @@ class AdminController extends BaseController {
   static updateCoupon = BaseController.asyncHandler(async (req, res) => {
     const adminId = getAdminId(req);
     const { id } = req.params;
-    const { data } = req.body;
+    const data = req.body;
 
     const validateData = BaseController.validateRequest(
       couponUpdateValidation,

@@ -11,13 +11,14 @@ const BaseController = require("./BaseController");
 class CouponController extends BaseController {
   //coupon fetch
   static couponFetch = BaseController.asyncHandler(async (req, res) => {
-    const { page, limit, search, sort } = req.query;
+    const { page, limit, search, sort, isFeatured } = req.query;
 
     const validatedData = BaseController.validateRequest(paginationValidation, {
       page,
       limit,
       search,
       sort,
+      isFeatured,
     });
 
     const result = await CouponService.couponFetch({

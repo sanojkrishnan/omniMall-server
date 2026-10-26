@@ -16,6 +16,7 @@ class CouponService {
     limit = 15,
     search = "",
     sort = "newest",
+    isFeatured = false,
     adminId,
   }) {
     try {
@@ -28,8 +29,21 @@ class CouponService {
         ];
       }
 
-      const sortOption = COUPON_SORT_MAP[sort] || COUPON_SORT_MAP.newest;
-      const skip = (page - 1) * limit;
+      let sortOption = COUPON_SORT_MAP[sort] || COUPON_SORT_MAP.newest;
+      let skip = (page - 1) * limit;
+
+      if (isFeatured) {
+        const now = new Date();
+
+        query.status = "active";
+        query.startDate = { $lte: now };
+        query.endDate = { $gte: now };
+
+        sortOption = { createdAt: -1 };
+        limit = 3;
+        page = 1;
+        skip = 0;
+      }
 
       const [coupons, total] = await Promise.all([
         Coupon.find(query).sort(sortOption).skip(skip).limit(limit),
@@ -66,7 +80,6 @@ class CouponService {
       throw error;
     }
   }
-
 }
 
 module.exports = CouponService;

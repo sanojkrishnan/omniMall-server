@@ -24,7 +24,7 @@ const couponValidation = Joi.object({
     .trim()
     .uppercase()
     .min(3)
-    .max(30)
+    .max(6)
     .required()
     .messages(customMessages),
 
