@@ -10,6 +10,7 @@ const {
 } = require("../utils/errors");
 const { sendOTPEmail, sendResetEmail } = require("../utils/nodemailer");
 const generateOTP = require("../utils/generateOtp");
+const processGoogleProfileImage = require("../utils/googleProfileImage");
 
 class AuthService {
   //registration
@@ -159,52 +160,52 @@ class AuthService {
     }
   }
 
- static async login(credentials) {
-  try {
-    const { email, password } = credentials;
+  static async login(credentials) {
+    try {
+      const { email, password } = credentials;
 
-    const user = await User.findByEmail(email);
-    if (!user || user.provider === "google") {
-      throw new AuthenticationError("Invalid email or password");
+      const user = await User.findByEmail(email);
+      if (!user || user.provider === "google") {
+        throw new AuthenticationError("Invalid email or password");
+      }
+
+      if (user.status === "banned") {
+        throw new AuthenticationError(
+          "Your account has been banned. Please contact administrator.",
+        );
+      }
+
+      const isPasswordValid = await user.comparePassword(password);
+      if (!isPasswordValid) {
+        throw new AuthenticationError("Invalid email or password");
+      }
+
+      user.lastLogin = new Date();
+      await user.save();
+
+      const tokenPayload = {
+        id: user._id,
+        email: user.email,
+        role: user.role,
+      };
+
+      // Sign with the secret matching the user's actual role
+      const token =
+        user.role === "admin"
+          ? generateAdminToken(tokenPayload)
+          : generateUserToken(tokenPayload);
+
+      logger.info(`User logged in: ${email}`);
+
+      return {
+        user: user.getPublicProfile(),
+        token,
+      };
+    } catch (error) {
+      logger.error("Login error:", error);
+      throw error;
     }
-
-    if (user.status === "banned") {
-      throw new AuthenticationError(
-        "Your account has been banned. Please contact administrator.",
-      );
-    }
-
-    const isPasswordValid = await user.comparePassword(password);
-    if (!isPasswordValid) {
-      throw new AuthenticationError("Invalid email or password");
-    }
-
-    user.lastLogin = new Date();
-    await user.save();
-
-    const tokenPayload = {
-      id: user._id,
-      email: user.email,
-      role: user.role,
-    };
-
-    // Sign with the secret matching the user's actual role
-    const token =
-      user.role === "admin"
-        ? generateAdminToken(tokenPayload)
-        : generateUserToken(tokenPayload);
-
-    logger.info(`User logged in: ${email}`);
-
-    return {
-      user: user.getPublicProfile(),
-      token,
-    };
-  } catch (error) {
-    logger.error("Login error:", error);
-    throw error;
   }
-}
 
   static async updateProfile(userId, updateData) {
     try {
@@ -330,12 +331,16 @@ class AuthService {
         );
       }
       if (!user) {
-        console.log("Creating user:", {
-          ...userData,
-          isVerified: true,
-        });
+        const profileImage = await processGoogleProfileImage(
+          userData.profileImage?.url,
+        );
+
         user = await User.create({
           ...userData,
+          profileImage: profileImage || {
+            url: null,
+            publicId: null,
+          },
           isVerified: true,
         });
       }
