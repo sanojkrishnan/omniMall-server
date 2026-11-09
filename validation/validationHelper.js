@@ -1,17 +1,17 @@
 const Joi = require("joi");
 const { paginationValidation } = require("./paginationValidation");
 const { strongPasswordValidation } = require("./authValidation");
-const { customMessages, commonPatterns } = require("./commonMessages");
+const { commonPatterns, customMessages } = require("./commonMessages");
 
-
+// ID validation
 const validateId = Joi.object({
-  id: commonPatterns.objectId.required().messages(customMessages),
+  id: commonPatterns.objectId.messages(customMessages),
 });
 
-//for updating
+// Reusable update validation
 const updateValidation = (schema) => {
   return Joi.object({
-    id: commonPatterns.objectId.required().messages(customMessages),
+    id: commonPatterns.objectId.messages(customMessages),
     data: schema.min(1).required(),
   });
 };
@@ -19,7 +19,9 @@ const updateValidation = (schema) => {
 const ValidationHelpers = {
   validatePagination: (query) => {
     const { error, value } = paginationValidation.validate(query);
+
     if (error) throw error;
+
     return value;
   },
 
@@ -33,6 +35,7 @@ const ValidationHelpers = {
 
   checkPasswordStrength: (password) => {
     const { error } = strongPasswordValidation.validate(password);
+
     return error === undefined;
   },
 };

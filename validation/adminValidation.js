@@ -1,19 +1,20 @@
 const Joi = require("joi");
 const { commonPatterns, customMessages } = require("./commonMessages");
+
 const {
   loginValidation,
   strongPasswordValidation,
 } = require("./authValidation");
 
-//admin create validation schema
+// Admin create validation
 const adminCreateValidation = Joi.object({
-  name: Joi.string().min(2).max(100).trim().required().messages(customMessages),
+  name: commonPatterns.name.messages(customMessages),
   email: commonPatterns.email.messages(customMessages),
   password: strongPasswordValidation,
   status: commonPatterns.status.messages(customMessages),
 });
 
-//admin login validation
+// Admin login validation
 const adminLoginValidation = loginValidation;
 
 module.exports = {

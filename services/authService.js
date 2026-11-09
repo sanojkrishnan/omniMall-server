@@ -11,6 +11,7 @@ const {
 const { sendOTPEmail, sendResetEmail } = require("../utils/nodemailer");
 const generateOTP = require("../utils/generateOtp");
 const processGoogleProfileImage = require("../utils/googleProfileImage");
+const { withCleanup, safeDestroy } = require("../utils/cloudinaryCleanup");
 
 class AuthService {
   //registration
@@ -207,30 +208,44 @@ class AuthService {
     }
   }
 
-  static async updateProfile(userId, updateData) {
+  static async updateProfile(userId, updateData = {}, file = null) {
     try {
-      delete updateData.password;
-      delete updateData.role;
-      delete updateData.status;
+      // allowlist: nothing else can be changed through this method
+      const allowedFields = ["firstName", "lastName", "dateOfBirth", "gender"];
+      const safeData = Object.fromEntries(
+        Object.entries(updateData).filter(([key]) =>
+          allowedFields.includes(key),
+        ),
+      );
 
-      const user = await User.findByIdAndUpdate(userId, updateData, {
-        new: true,
-        runValidators: true,
+      // if anything fails, the image multer already uploaded is removed
+      const { user, oldPublicId } = await withCleanup(file, async () => {
+        const user = await User.findById(userId);
+        if (!user) throw new NotFoundError("User not found");
+
+        let oldPublicId = null;
+
+        user.set(safeData);
+
+        if (file) {
+          oldPublicId = user.profileImage?.publicId;
+          user.profileImage = { url: file.path, publicId: file.filename };
+        }
+
+        await user.save(); // runs schema validators
+        return { user, oldPublicId };
       });
 
-      if (!user) {
-        throw new NotFoundError("User not found");
-      }
+      // delete the previous image only after the new data is saved
+      await safeDestroy(oldPublicId);
 
       logger.info(`Profile updated: ${user.email}`);
-
       return user.getPublicProfile();
     } catch (error) {
       logger.error("Profile update error:", error);
       throw error;
     }
   }
-
   static async changePassword(userId, passwordData) {
     try {
       const { currentPassword, newPassword } = passwordData;

@@ -8,11 +8,17 @@ const {
   loginValidation,
   resetPasswordValidation,
   emailValidation,
+  updateProfileValidation,
 } = require("../validation/authValidation");
 const {
   googleAuthValidation,
   googleProfileCompletionValidation,
 } = require("../validation/googleValidation");
+const { ValidationError } = require("../utils/errors");
+const { withCleanup } = require("../utils/cloudinaryCleanup");
+const { sellerRegisterValidation } = require("../validation/sellerValidation");
+const { SellerService } = require("../services");
+const { validateId } = require("../validation/validationHelper");
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 class AuthController extends BaseController {
@@ -44,9 +50,44 @@ class AuthController extends BaseController {
 
     BaseController.sendSuccess(
       res,
-      "Pl;ease verify your email with the OTP sent to your inbox",
+      "Please verify your email with the OTP sent to your inbox",
       result,
       201,
+    );
+  });
+
+  //update profile controller (text fields and/or profile image)
+  static updateProfile = BaseController.asyncHandler(async (req, res) => {
+    const userId = req.user.id;
+
+    // pick only the editable fields; ignore anything else in the body
+    const { firstName, lastName, dateOfBirth, gender } = req.body;
+    const fields = Object.fromEntries(
+      Object.entries({ firstName, lastName, dateOfBirth, gender }).filter(
+        ([, value]) => value !== undefined,
+      ),
+    );
+
+    // validation failures must also remove the file multer already uploaded
+    const validatedData = await withCleanup(req.file, async () => {
+      if (Object.keys(fields).length === 0 && !req.file) {
+        throw new ValidationError("Provide at least one field to update");
+      }
+      return BaseController.validateRequest(updateProfileValidation, fields);
+    });
+
+    const result = await AuthService.updateProfile(
+      userId,
+      validatedData,
+      req.file,
+    );
+
+    BaseController.logAction("USER_UPDATE_PROFILE", result);
+    BaseController.sendSuccess(
+      res,
+      "Profile updated successfully",
+      result,
+      200,
     );
   });
 
@@ -180,6 +221,59 @@ class AuthController extends BaseController {
       );
     },
   );
+
+  static becomeSeller = BaseController.asyncHandler(async (req, res) => {
+    const {
+      storeName,
+      productCategories,
+      description,
+      businessEmail,
+      businessPhone,
+      businessAddress,
+      pickupLocation,
+      conditionCheck,
+    } = req.body;
+
+    const sellerData = {
+      storeName,
+      productCategories,
+      description,
+      businessEmail,
+      businessPhone,
+      businessAddress,
+      pickupLocation,
+      conditionCheck,
+    };
+    const userId = req.user.id;
+
+    // the logo is required, so a missing file fails validation
+    if (req.file) {
+      sellerData.businessLogo = {
+        url: req.file.path,
+        publicId: req.file.filename,
+      };
+    }
+
+    // any failure removes the logo multer already uploaded
+    const result = await withCleanup(req.file, async () => {
+      const validatedData = BaseController.validateRequest(
+        sellerRegisterValidation,
+        sellerData,
+      );
+      const validatedUserId = BaseController.validateRequest(validateId, {
+        id: userId,
+      });
+      return SellerService.register(validatedData, validatedUserId.id);
+    });
+
+    BaseController.logAction("SELLER_REGISTER", req.user);
+    BaseController.sendSuccess(
+      res,
+      "The seller registration request has been submitted successfully. Please wait for approval.",
+      result,
+      201,
+    );
+  });
 }
 
 module.exports = AuthController;

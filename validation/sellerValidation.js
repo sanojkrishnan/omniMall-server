@@ -18,6 +18,39 @@ const isCallForSeller = Joi.object({
     .messages(customMessages),
 });
 
+const sellerRegisterValidation = Joi.object({
+  storeName: commonPatterns.businessName.messages(customMessages),
+  businessEmail: commonPatterns.email.messages(customMessages),
+  description: commonPatterns.description.messages(customMessages),
+  businessPhone: commonPatterns.phone.messages(customMessages),
+  businessAddress: commonPatterns.address.messages(customMessages),
+  pickupLocation: commonPatterns.address.messages(customMessages),
+  productCategories: Joi.array()
+    .items(commonPatterns.objectId)
+    .min(1)
+    .unique()
+    .required()
+    .messages(customMessages),
+  businessLogo: Joi.object({
+    url: Joi.string().uri().required(),
+    publicId: Joi.string().required(),
+  })
+    .required()
+    .messages({
+      ...customMessages,
+      "any.required": "Business logo is required",
+    }),
+  conditionCheck: Joi.boolean()
+    .valid(true)
+    .required()
+    .messages({
+      ...customMessages,
+      "any.only": "You must agree to the terms and conditions",
+      "any.required": "You must agree to the terms and conditions",
+    }),
+});
+
 module.exports = {
   isCallForSeller,
+  sellerRegisterValidation,
 };

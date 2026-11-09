@@ -1,45 +1,35 @@
 const Joi = require("joi");
 const { commonPatterns, customMessages } = require("./commonMessages");
 
-//email validation
+// Strong password validation
+const strongPasswordValidation = commonPatterns.strongPasswordValidation;
+
+// Email validation
 const emailValidation = Joi.object({
   email: commonPatterns.email.messages(customMessages),
 });
 
-//checking password strong or not
-const strongPasswordValidation = Joi.string()
-  .min(8)
-  .max(128)
-  .pattern(new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])"))
-  .required()
-  .messages({
-    ...customMessages,
-    "string.pattern.base":
-      "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
-  });
-
-//otp validation schema
+// OTP validation
 const otpValidation = Joi.object({
   email: commonPatterns.email.messages(customMessages),
-  otp: Joi.string().length(6).required().messages(customMessages),
+  otp: commonPatterns.otp.messages(customMessages),
 });
 
-//login validation schema
-// Intentionally uses plain required() rather than strongPasswordValidation:
-// strength is enforced at registration time, login only needs to confirm a
-// password was submitted.
+// Login validation
 const loginValidation = Joi.object({
   email: commonPatterns.email.messages(customMessages),
+
   password: Joi.string().required().messages(customMessages),
 });
 
-//reset password validation schema
+// Reset password validation
 const resetPasswordValidation = Joi.object({
-  token: Joi.string().required().messages(customMessages),
+  token: commonPatterns.token.messages(customMessages),
+
   password: strongPasswordValidation,
 });
 
-//registration validation schema
+// Registration validation
 const registerValidation = Joi.object({
   firstName: commonPatterns.firstName.messages(customMessages),
   lastName: commonPatterns.lastName.messages(customMessages),
@@ -50,6 +40,15 @@ const registerValidation = Joi.object({
   gender: commonPatterns.gender.messages(customMessages),
 });
 
+// Update profile validation
+const updateProfileValidation = Joi.object({
+  firstName: commonPatterns.firstName.optional().messages(customMessages),
+  lastName: commonPatterns.lastName.optional().messages(customMessages),
+  dateOfBirth: commonPatterns.dateOfBirth.optional().messages(customMessages),
+  gender: commonPatterns.gender.optional().messages(customMessages),
+  email: commonPatterns.email.optional().messages(customMessages),
+}).min(1);
+
 module.exports = {
   strongPasswordValidation,
   registerValidation,
@@ -57,4 +56,5 @@ module.exports = {
   loginValidation,
   otpValidation,
   emailValidation,
+  updateProfileValidation,
 };

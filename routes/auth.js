@@ -8,13 +8,15 @@ const {
   googleAuth,
   googleProfileCompletion,
   resendOTP,
-  findSeller,
+  updateProfile,
+  becomeSeller,
 } = require("../controller/AuthController");
 const { uploadUserImage } = require("../config/cloudinary");
 const {
   uploadProfileImage,
   deleteProfileImage,
 } = require("../controller/imageController");
+const { userAuth } = require("../middleware/tockenVerify");
 
 const router = express.Router();
 //register route
@@ -23,6 +25,13 @@ router.post(
   uploadUserImage.single("profileImage"),
 
   register,
+);
+//edit profile route
+router.patch(
+  "/update-profile",
+  userAuth,
+  uploadUserImage.single("profileImage"),
+  updateProfile,
 );
 //otp verification route
 router.post("/verify-otp", verifyOTP);
@@ -45,5 +54,13 @@ router.post("/reset-password", resetPassword);
 //google login method
 router.post("/google", googleAuth);
 router.patch("/complete-profile", googleProfileCompletion);
+
+//seller registration route
+router.post(
+  "/become-seller",
+  userAuth,
+  uploadUserImage.single("businessLogo"),
+  becomeSeller,
+);
 
 module.exports = router;
