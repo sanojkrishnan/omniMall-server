@@ -84,6 +84,11 @@ const sellerSchema = new mongoose.Schema(
       enum: ["approved", "banned", "pending", "rejected", "suspended"],
       default: "pending",
     },
+    role: {
+      type: String,
+      enum: ["seller"],
+      default: "seller",
+    },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -120,6 +125,15 @@ const sellerSchema = new mongoose.Schema(
 //static method to find all approved sellers
 sellerSchema.statics.findApprovedSellers = function () {
   return this.find({ status: "approved" });
+};
+sellerSchema.methods.getPublicProfile = function () {
+  const sellerObject = this.toObject();
+  delete sellerObject.businessPhone;
+  delete sellerObject.businessAddress;
+  delete sellerObject.pickupLocation;
+  delete sellerObject.businessLogo.publicId;
+  delete sellerObject.userId;
+  return sellerObject;
 };
 //static method to find seller by userId
 sellerSchema.statics.findByUser = function (userId) {

@@ -3,41 +3,29 @@ const { paginationValidation } = require("./paginationValidation");
 const { strongPasswordValidation } = require("./authValidation");
 const { commonPatterns, customMessages } = require("./commonMessages");
 
-// ID validation
 const validateId = Joi.object({
   id: commonPatterns.objectId.messages(customMessages),
 });
 
-// Reusable update validation
-const updateValidation = (schema) => {
-  return Joi.object({
+// Reusable update validation: { id, data: <at least one field> }
+const updateValidation = (schema) =>
+  Joi.object({
     id: commonPatterns.objectId.messages(customMessages),
-    data: schema.min(1).required(),
-  });
-};
+    data: schema.min(1).required().messages(customMessages),
+  }).prefs({ noDefaults: true }); // partial updates must not inject create-time defaults
 
 const ValidationHelpers = {
   validatePagination: (query) => {
     const { error, value } = paginationValidation.validate(query);
-
     if (error) throw error;
-
     return value;
   },
-
-  isValidObjectId: (id) => {
-    return commonPatterns.objectId.validate(id).error === undefined;
-  },
-
-  isValidEmail: (email) => {
-    return commonPatterns.email.validate(email).error === undefined;
-  },
-
-  checkPasswordStrength: (password) => {
-    const { error } = strongPasswordValidation.validate(password);
-
-    return error === undefined;
-  },
+  isValidObjectId: (id) =>
+    commonPatterns.objectId.validate(id).error === undefined,
+  isValidEmail: (email) =>
+    commonPatterns.email.validate(email).error === undefined,
+  checkPasswordStrength: (password) =>
+    strongPasswordValidation.validate(password).error === undefined,
 };
 
 module.exports = {

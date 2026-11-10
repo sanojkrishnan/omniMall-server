@@ -1,8 +1,5 @@
 const express = require("express");
-const {
-  findProductCategory,
-  fetchSingleCategory,
-} = require("../controller/CategoryController");
+const { findProductCategory, fetchSingleCategory } = require("../controller");
 const router = express.Router();
 
 router.post("/fetch", findProductCategory);

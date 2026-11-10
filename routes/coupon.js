@@ -1,8 +1,5 @@
 const express = require("express");
-const {
-  couponFetch,
-  singleCouponFetch,
-} = require("../controller/CouponController");
+const { couponFetch, singleCouponFetch } = require("../controller");
 const { adminAuth } = require("../middleware/tockenVerify");
 
 const router = express.Router();

@@ -3,7 +3,6 @@ const { commonPatterns, customMessages } = require("./commonMessages");
 
 const addCartValidation = Joi.object({
   userId: commonPatterns.objectId.messages(customMessages),
-
   cart: Joi.array()
     .items(
       Joi.object({

@@ -28,6 +28,19 @@ const generateAdminToken = (payload) => {
   }
 };
 
+//generate seller token
+
+const generateSellerToken = (payload) => {
+  try {
+    return jwt.sign(payload, config.JWT_SECRET.SELLER_SECRET, {
+      expiresIn: config.JWT_SECRET.EXPIRE_IN,
+    });
+  } catch (error) {
+    logger.error("Error generating seller token:", error);
+    throw new Error("Token generation failed");
+  }
+};
+
 //verify user token
 
 const verifyUserToken = (token) => {
@@ -55,9 +68,25 @@ const verifyAdminToken = (token) => {
   }
 };
 
+//verify seller token
+
+const verifySellerToken = (token) => {
+  try {
+    if (!config.JWT_SECRET.SELLER_SECRET) {
+      throw new Error("JWT_SELLER_SECRET not configured");
+    }
+
+    return jwt.verify(token, config.JWT_SECRET.SELLER_SECRET);
+  } catch (error) {
+    throw new Error("Token verification failed");
+  }
+};
+
 module.exports = {
   generateUserToken,
   generateAdminToken,
+  generateSellerToken,
   verifyUserToken,
   verifyAdminToken,
+  verifySellerToken,
 };

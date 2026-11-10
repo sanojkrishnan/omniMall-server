@@ -1,5 +1,5 @@
 const { OAuth2Client } = require("google-auth-library");
-const AuthService = require("../services/authService");
+const { AuthService } = require("../services");
 const BaseController = require("./BaseController");
 const config = require("../config/config");
 const {
@@ -9,16 +9,12 @@ const {
   resetPasswordValidation,
   emailValidation,
   updateProfileValidation,
-} = require("../validation/authValidation");
-const {
   googleAuthValidation,
   googleProfileCompletionValidation,
-} = require("../validation/googleValidation");
+} = require("../validation");
 const { ValidationError } = require("../utils/errors");
 const { withCleanup } = require("../utils/cloudinaryCleanup");
-const { sellerRegisterValidation } = require("../validation/sellerValidation");
-const { SellerService } = require("../services");
-const { validateId } = require("../validation/validationHelper");
+
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 class AuthController extends BaseController {
@@ -221,59 +217,6 @@ class AuthController extends BaseController {
       );
     },
   );
-
-  static becomeSeller = BaseController.asyncHandler(async (req, res) => {
-    const {
-      storeName,
-      productCategories,
-      description,
-      businessEmail,
-      businessPhone,
-      businessAddress,
-      pickupLocation,
-      conditionCheck,
-    } = req.body;
-
-    const sellerData = {
-      storeName,
-      productCategories,
-      description,
-      businessEmail,
-      businessPhone,
-      businessAddress,
-      pickupLocation,
-      conditionCheck,
-    };
-    const userId = req.user.id;
-
-    // the logo is required, so a missing file fails validation
-    if (req.file) {
-      sellerData.businessLogo = {
-        url: req.file.path,
-        publicId: req.file.filename,
-      };
-    }
-
-    // any failure removes the logo multer already uploaded
-    const result = await withCleanup(req.file, async () => {
-      const validatedData = BaseController.validateRequest(
-        sellerRegisterValidation,
-        sellerData,
-      );
-      const validatedUserId = BaseController.validateRequest(validateId, {
-        id: userId,
-      });
-      return SellerService.register(validatedData, validatedUserId.id);
-    });
-
-    BaseController.logAction("SELLER_REGISTER", req.user);
-    BaseController.sendSuccess(
-      res,
-      "The seller registration request has been submitted successfully. Please wait for approval.",
-      result,
-      201,
-    );
-  });
 }
 
 module.exports = AuthController;

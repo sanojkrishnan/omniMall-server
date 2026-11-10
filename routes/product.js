@@ -4,13 +4,12 @@ const {
   addProduct,
   fetchSingleProduct,
   updateProduct,
-} = require("../controller/ProductController");
-const { uploadProductImage } = require("../config/cloudinary");
-const {
   changeProductImage,
   deleteProductImage,
   saveProductImages,
-} = require("../controller/ImageController");
+} = require("../controller");
+const { uploadProductImage } = require("../config/cloudinary");
+
 const router = express.Router();
 
 router.post("/fetch", productFetch);

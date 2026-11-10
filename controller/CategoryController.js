@@ -1,7 +1,6 @@
-const CategoryService = require("../services/categoryService");
+const { CategoryService } = require("../services");
 const BaseController = require("./BaseController");
-const { isCallForCategory } = require("../validation/categoryValidation");
-const { validateId } = require("../validation/validationHelper");
+const { validateId, isCallForCategory } = require("../validation");
 
 class CategoryController extends BaseController {
   static findProductCategory = BaseController.asyncHandler(async (req, res) => {

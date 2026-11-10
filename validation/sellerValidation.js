@@ -1,21 +1,10 @@
 const Joi = require("joi");
 const { customMessages, commonPatterns } = require("./commonMessages");
 
-//call for seller
 const isCallForSeller = Joi.object({
-  uniqueSellers: Joi.array()
-    .items(commonPatterns.objectId)
-    .min(0)
-    .optional()
-    .default([])
-    .messages(customMessages),
-  page: Joi.number().integer().min(1).default(1).messages(customMessages),
-  limit: Joi.number()
-    .integer()
-    .min(1)
-    .max(100)
-    .default(15)
-    .messages(customMessages),
+  uniqueSellers: commonPatterns.uniqueCategories.messages(customMessages),
+  page: commonPatterns.page.messages(customMessages),
+  limit: commonPatterns.limit.messages(customMessages),
 });
 
 const sellerRegisterValidation = Joi.object({
@@ -25,29 +14,17 @@ const sellerRegisterValidation = Joi.object({
   businessPhone: commonPatterns.phone.messages(customMessages),
   businessAddress: commonPatterns.address.messages(customMessages),
   pickupLocation: commonPatterns.address.messages(customMessages),
-  productCategories: Joi.array()
-    .items(commonPatterns.objectId)
-    .min(1)
-    .unique()
-    .required()
-    .messages(customMessages),
-  businessLogo: Joi.object({
-    url: Joi.string().uri().required(),
-    publicId: Joi.string().required(),
-  })
-    .required()
-    .messages({
-      ...customMessages,
-      "any.required": "Business logo is required",
-    }),
-  conditionCheck: Joi.boolean()
-    .valid(true)
-    .required()
-    .messages({
-      ...customMessages,
-      "any.only": "You must agree to the terms and conditions",
-      "any.required": "You must agree to the terms and conditions",
-    }),
+  productCategories:
+    commonPatterns.requiredUniqueObjectIds.messages(customMessages),
+  businessLogo: commonPatterns.imageRequired.messages({
+    ...customMessages,
+    "any.required": "Business logo is required",
+  }),
+  conditionCheck: commonPatterns.terms.messages({
+    ...customMessages,
+    "any.only": "You must agree to the terms and conditions",
+    "any.required": "You must agree to the terms and conditions",
+  }),
 });
 
 module.exports = {

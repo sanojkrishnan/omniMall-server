@@ -6,6 +6,7 @@ const {
   NotFoundError,
   AuthenticationError,
 } = require("../utils/errors");
+const { generateSellerToken } = require("../utils/jwt");
 
 class SellerService {
   //register a new seller
@@ -81,23 +82,49 @@ class SellerService {
     }
   }
 
+  //fetch single seller with _id
+  static async fetchOneSeller(userId) {
+    try {
+      const seller = await Seller.findByUser(userId);
+
+      console.log("SELLER Id: ", userId);
+
+      if (!seller) {
+        throw new NotFoundError("Seller not found");
+      }
+
+      const tokenPayload = {
+        id: seller._id,
+        email: seller.businessEmail,
+        role: seller.role,
+      };
+
+      const token = generateSellerToken(tokenPayload);
+
+      logger.info("Seller send:", seller);
+      return { seller: seller.getPublicProfile(), token };
+    } catch (error) {
+      logger.error("Fetch seller error:", error);
+      throw error;
+    }
+  }
+
   //fetch all seller users
   static async findSeller(page = 1, limit = 15, uniqueSellers = []) {
     try {
+      uniqueSellers = uniqueSellers ?? [];
+
       const skip = (page - 1) * limit;
+      const filter =
+        uniqueSellers.length > 0 ? { _id: { $in: uniqueSellers } } : {};
 
-      const filter = { role: "seller" };
-      if (uniqueSellers.length > 0) {
-        filter._id = { $in: uniqueSellers };
-      }
-
-      const [seller, total] = await Promise.all([
-        User.find(filter).skip(skip).limit(limit),
-        User.countDocuments(filter),
+      const [sellers, total] = await Promise.all([
+        Seller.find(filter).skip(skip).limit(limit),
+        Seller.countDocuments(filter),
       ]);
 
       return {
-        data: seller,
+        data: sellers,
         pagination: {
           total,
           page,
@@ -108,7 +135,7 @@ class SellerService {
         },
       };
     } catch (error) {
-      logger.error("Seller fetching error:", error);
+      logger.error("Sellers fetching error:", error);
       throw error;
     }
   }

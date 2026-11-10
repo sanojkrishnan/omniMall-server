@@ -1,13 +1,13 @@
-const ProductService = require("../services/productService");
+const { ProductService } = require("../services");
 const BaseController = require("./BaseController");
 const { withCleanup } = require("../utils/cloudinaryCleanup");
 const { ValidationError } = require("../utils/errors");
 const {
   productValidation,
   productUpdateValidation,
-} = require("../validation/productValidation");
-const { paginationValidation } = require("../validation/paginationValidation");
-const { validateId } = require("../validation/validationHelper");
+  paginationValidation,
+  validateId,
+} = require("../validation");
 
 class ProductController extends BaseController {
   // add product

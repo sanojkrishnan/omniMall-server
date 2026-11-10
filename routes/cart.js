@@ -3,8 +3,8 @@ const {
   fetchCart,
   addCart,
   removeCart,
-  updateProductQuantity
-} = require("../controller/CartController");
+  updateProductQuantity,
+} = require("../controller");
 const { userAuth } = require("../middleware/tockenVerify");
 
 const router = express.Router();

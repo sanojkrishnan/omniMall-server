@@ -1,11 +1,8 @@
-const CouponService = require("../services/couponService");
+const { CouponService } = require("../services");
 const {
-  couponUpdateValidation,
-  updateStatusValidation,
-  couponValidation,
-} = require("../validation/couponValidation");
-const { paginationValidation } = require("../validation/paginationValidation");
-const { validateId } = require("../validation/validationHelper");
+  paginationValidation,
+  validateId,
+} = require("../validation");
 const BaseController = require("./BaseController");
 
 class CouponController extends BaseController {

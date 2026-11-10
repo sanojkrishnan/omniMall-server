@@ -12,6 +12,7 @@ const { sendOTPEmail, sendResetEmail } = require("../utils/nodemailer");
 const generateOTP = require("../utils/generateOtp");
 const processGoogleProfileImage = require("../utils/googleProfileImage");
 const { withCleanup, safeDestroy } = require("../utils/cloudinaryCleanup");
+const Seller = require("../models/Seller");
 
 class AuthService {
   //registration
@@ -449,59 +450,6 @@ class AuthService {
     }
   }
   //-------------------------------------seller part--------------------------------------------------------------------------
-  //fetch all seller users
-  static async findSeller(page = 1, limit = 15, uniqueSellers = []) {
-    try {
-      uniqueSellers = uniqueSellers ?? [];
-
-      const skip = (page - 1) * limit;
-      const filter =
-        uniqueSellers.length > 0
-          ? { _id: { $in: uniqueSellers }, role: "seller" }
-          : { role: "seller" };
-
-      const [sellers, total] = await Promise.all([
-        User.find(filter).skip(skip).limit(limit),
-        User.countDocuments(filter),
-      ]);
-
-      return {
-        data: sellers,
-        pagination: {
-          total,
-          page,
-          limit,
-          totalPages: Math.ceil(total / limit),
-          hasNextPage: page < Math.ceil(total / limit),
-          hasPrevPage: page > 1,
-        },
-      };
-    } catch (error) {
-      logger.error("Sellers fetching error:", error);
-      throw error;
-    }
-  }
-
-  //fetch single seller with _id
-  static async fetchOneSeller(sellerId) {
-    try {
-      if (!sellerId) {
-        throw new Error("Seller ID is required");
-      }
-
-      const seller = await User.find({ _id: sellerId, role: "seller" });
-
-      if (!seller) {
-        throw new Error("Seller not found");
-      }
-
-      logger.info("Seller send:", seller);
-      return seller;
-    } catch (error) {
-      logger.error("Fetch seller error:", error);
-      throw error;
-    }
-  }
 }
 
 module.exports = AuthService;

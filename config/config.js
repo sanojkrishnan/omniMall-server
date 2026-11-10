@@ -27,6 +27,7 @@ module.exports = {
   JWT_SECRET: {
     USER_SECRET: process.env.JWT_USER_SECRET,
     ADMIN_SECRET: process.env.JWT_ADMIN_SECRET,
+    SELLER_SECRET: process.env.JWT_SELLER_SECRET,
     EXPIRE_IN: process.env.JWT_EXPIRES_IN,
   },
 

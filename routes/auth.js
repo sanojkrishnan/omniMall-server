@@ -10,12 +10,11 @@ const {
   resendOTP,
   updateProfile,
   becomeSeller,
-} = require("../controller/AuthController");
-const { uploadUserImage } = require("../config/cloudinary");
-const {
   uploadProfileImage,
   deleteProfileImage,
-} = require("../controller/imageController");
+} = require("../controller");
+const { uploadUserImage } = require("../config/cloudinary");
+
 const { userAuth } = require("../middleware/tockenVerify");
 
 const router = express.Router();

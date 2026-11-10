@@ -148,6 +148,13 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
 userSchema.methods.getPublicProfile = function () {
   const userObject = this.toObject();
   delete userObject.password;
+  delete userObject._id;
+  delete userObject.bannedBy;
+  delete userObject.profileImage.publicId;
+  delete userObject.resetPasswordToken;
+  delete userObject.resetPasswordExpires;
+  delete userObject.otp;
+  delete userObject.otpValidationExpires;
   return userObject;
 };
 //static method to find all active users

@@ -1,17 +1,15 @@
-const AdminService = require("../services/adminService");
+const { AdminService } = require("../services");
 const { withCleanup } = require("../utils/cloudinaryCleanup");
 const { ValidationError } = require("../utils/errors");
+const BaseController = require("./BaseController");
 const {
   categoryValidation,
   categoryUpdateValidation,
-} = require("../validation/categoryValidation");
-const {
   couponValidation,
   couponUpdateValidation,
   updateStatusValidation,
-} = require("../validation/couponValidation");
-const { validateId } = require("../validation/validationHelper");
-const BaseController = require("./BaseController");
+  validateId,
+} = require("../validation");
 
 // validates the admin id from the token with the shared id schema, returns the id string
 const getAdminId = (req) =>

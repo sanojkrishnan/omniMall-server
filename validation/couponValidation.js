@@ -4,10 +4,8 @@ const {
   customMessages,
   objectIdItem,
 } = require("./commonMessages");
-
 const { updateValidation } = require("./validationHelper");
 
-// Coupon fetch
 const couponFetchValidation = Joi.object({
   id: commonPatterns.objectId.optional().messages(customMessages),
   page: commonPatterns.page.messages(customMessages),
@@ -16,110 +14,59 @@ const couponFetchValidation = Joi.object({
   sort: commonPatterns.sort.messages(customMessages),
 }).messages(customMessages);
 
-// Update coupon status
 const updateStatusValidation = Joi.object({
   id: commonPatterns.objectId.messages(customMessages),
-
-  status: Joi.string()
-    .valid("active", "inactive", "pending")
-    .required()
-    .messages(customMessages),
+  status: commonPatterns.couponStatus.messages(customMessages),
 });
 
-// Coupon create
 const couponValidation = Joi.object({
-  name: Joi.string().trim().min(3).max(100).required().messages(customMessages),
-
-  code: Joi.string()
-    .trim()
-    .uppercase()
-    .min(3)
-    .max(6)
-    .required()
-    .messages(customMessages),
-
-  description: Joi.string()
-    .trim()
-    .min(5)
-    .max(500)
-    .required()
-    .messages(customMessages),
-
-  discountType: Joi.string()
-    .valid("percentage", "flat")
-    .required()
-    .messages(customMessages),
-
-  discountValue: Joi.number().min(0).required().messages(customMessages),
+  name: commonPatterns.couponName.messages(customMessages),
+  code: commonPatterns.couponCode.messages(customMessages),
+  description: commonPatterns.couponDescription.messages(customMessages),
+  discountType: commonPatterns.discountType.messages(customMessages),
+  discountValue: commonPatterns.nonNegative.messages(customMessages),
 
   maxDiscount: Joi.number()
     .min(0)
     .when("discountType", {
-      is: "percentage",
-      then: Joi.number().min(0).required(),
-      otherwise: Joi.forbidden(),
+      switch: [
+        { is: "percentage", then: commonPatterns.nonNegative },
+        { is: "flat", then: Joi.forbidden() },
+      ],
     })
     .messages(customMessages),
 
-  minOrderAmount: Joi.number().min(0).required().messages(customMessages),
+  minOrderAmount: commonPatterns.nonNegative.messages(customMessages),
 
   startDate: Joi.date().required().messages(customMessages),
-
   endDate: Joi.date()
-    .greater(Joi.ref("startDate"))
     .required()
+    .when("startDate", {
+      is: Joi.exist(),
+      then: Joi.date().greater(Joi.ref("startDate")),
+    })
     .messages({
       ...customMessages,
       "date.greater": "End date must be after start date",
     }),
 
-  usageLimit: Joi.number().integer().min(1).required().messages(customMessages),
+  usageLimit: commonPatterns.positiveInteger.messages(customMessages),
+  usagePerUser: commonPatterns.positiveInteger.messages(customMessages),
 
-  usagePerUser: Joi.number()
-    .integer()
-    .min(1)
-    .required()
-    .messages(customMessages),
+  applicableProducts: commonPatterns.objectIdArray.messages(customMessages),
+  applicableCategories: commonPatterns.objectIdArray.messages(customMessages),
+  excludedProducts: commonPatterns.objectIdArray.messages(customMessages),
+  sellerIds: commonPatterns.objectIdArray.messages(customMessages),
 
-  applicableProducts: Joi.array()
-    .items(objectIdItem)
-    .default([])
-    .messages(customMessages),
+  eligibleUsers: commonPatterns.eligibleUsers.messages(customMessages),
+  paymentMethods: commonPatterns.paymentMethods.messages(customMessages),
 
-  applicableCategories: Joi.array()
-    .items(objectIdItem)
-    .default([])
-    .messages(customMessages),
-
-  excludedProducts: Joi.array()
-    .items(objectIdItem)
-    .default([])
-    .messages(customMessages),
-
-  sellerIds: Joi.array()
-    .items(objectIdItem)
-    .default([])
-    .messages(customMessages),
-
-  eligibleUsers: Joi.string()
-    .valid("all", "new", "existing")
-    .required()
-    .messages(customMessages),
-
-  paymentMethods: Joi.array()
-    .items(Joi.string().valid("COD", "CARD", "UPI"))
-    .unique()
-    .default(["COD", "CARD", "UPI"])
-    .messages(customMessages),
-
-  stackable: Joi.boolean().default(false).messages(customMessages),
-
-  autoApply: Joi.boolean().default(false).messages(customMessages),
+  stackable: commonPatterns.boolean.default(false).messages(customMessages),
+  autoApply: commonPatterns.boolean.default(false).messages(customMessages),
 
   createdBy: commonPatterns.objectId.messages(customMessages),
 }).messages(customMessages);
 
-// Coupon update
 const couponUpdateValidation = updateValidation(
   couponValidation.fork(
     [
