@@ -130,6 +130,7 @@ sellerSchema.methods.getPublicProfile = function () {
   const sellerObject = this.toObject();
   delete sellerObject.businessPhone;
   delete sellerObject.businessAddress;
+  delete sellerObject.businessEmail;
   delete sellerObject.pickupLocation;
   delete sellerObject.businessLogo.publicId;
   delete sellerObject.userId;
