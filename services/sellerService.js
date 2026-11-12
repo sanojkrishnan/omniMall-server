@@ -102,7 +102,7 @@ class SellerService {
       const token = generateSellerToken(tokenPayload);
 
       logger.info("Seller send:", seller);
-      return { seller: seller.getPublicProfile(), token };
+      return { seller: seller.removeSellerCore(), token };
     } catch (error) {
       logger.error("Fetch seller error:", error);
       throw error;

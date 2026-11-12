@@ -136,6 +136,12 @@ sellerSchema.methods.getPublicProfile = function () {
   delete sellerObject.userId;
   return sellerObject;
 };
+sellerSchema.methods.removeSellerCore = function () {
+  const sellerObject = this.toObject();
+  delete sellerObject.businessLogo.publicId;
+  delete sellerObject.userId;
+  return sellerObject;
+};
 //static method to find seller by userId
 sellerSchema.statics.findByUser = function (userId) {
   return this.findOne({ userId });
