@@ -6,4 +6,5 @@ module.exports = {
   CouponService: require("./couponService"),
   AdminService: require("./adminService"),
   SellerService: require("./sellerService"),
+  AddressService: require("./addressService"),
 };

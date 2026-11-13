@@ -2,12 +2,13 @@ const config = require("../config/config");
 const { createAuthLimiter } = require("../middleware/setup"); //limits the authentication calls
 
 const authRoutes = require("./auth"); //path for authentication
-const adminRoutes = require("./admin"); //path for admin 
+const adminRoutes = require("./admin"); //path for admin
 const sellerRoutes = require("./seller"); //path for sellers
 const productRoutes = require("./product"); //path for products
 const categoryRoutes = require("./category"); //path for categories
 const cartRoutes = require("./cart"); //path for cart
 const couponRoutes = require("./coupon"); //coupon
+const addressRoutes = require("./address"); //address
 
 const setupRoutes = (app) => {
   //main protected routes
@@ -48,6 +49,11 @@ const setupRoutes = (app) => {
     "/api/coupon",
     ...(shouldUseAuthLimiter ? [authLimiter] : []),
     couponRoutes,
+  );
+  app.use(
+    "/api/address",
+    ...(shouldUseAuthLimiter ? [authLimiter] : []),
+    addressRoutes,
   );
 };
 

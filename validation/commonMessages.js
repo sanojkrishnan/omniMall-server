@@ -69,16 +69,20 @@ const commonPatterns = {
     .unique()
     .required(),
 
-  // Personal information
+  //information
   dateOfBirth: Joi.date().required(),
   gender: Joi.string().valid("male", "female", "other").required(),
-
-  // Business information
   description: Joi.string().min(10).max(500).trim().required(),
   phone: Joi.string()
-    .pattern(/^[0-9]{10}$/)
+    .pattern(/^\+[1-9]\d{7,14}$/)
     .required(),
   address: Joi.string().min(5).max(300).trim().required(),
+  addressOptional: Joi.string().min(5).max(300).trim().optional(),
+  city: Joi.string().min(2).max(50).trim().required(),
+  state: Joi.string().min(2).max(50).trim().required(),
+  pincode: Joi.string()
+    .pattern(/^\d{6}$/)
+    .required(),
 
   // Images
   image: imageObject.optional(),
@@ -93,6 +97,7 @@ const commonPatterns = {
   couponStatus: Joi.string().valid("active", "inactive", "pending").required(),
   role: Joi.string().valid("user", "seller", "admin").default("user"),
   provider: Joi.string().default("google"),
+  label: Joi.string().valid("home", "work", "other").default("home"),
 
   // Numbers
   quantity: Joi.number().integer().min(1).max(100).required(),

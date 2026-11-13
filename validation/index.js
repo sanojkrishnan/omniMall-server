@@ -13,6 +13,7 @@ module.exports = {
   ...require("./paginationValidation"),
   ...require("./productValidation"),
   ...require("./sellerValidation"),
+  ...require("./addressValidation"),
 
   // Shared validate() so every route uses identical options + messages
   validate: (schema, data) => {

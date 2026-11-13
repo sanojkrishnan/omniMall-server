@@ -7,6 +7,7 @@ const CategoryController = require("./CategoryController");
 const CouponController = require("./CouponController");
 const ProductController = require("./ProductController");
 const SellerController = require("./SellerController");
+const AddressController = require("./AddressController");
 
 module.exports = {
   register: AuthController.register,
@@ -61,4 +62,8 @@ module.exports = {
   findProductSeller: SellerController.findProductSeller,
   fetchSingleSeller: SellerController.fetchSingleSeller,
   becomeSeller: SellerController.becomeSeller,
+
+  //address
+  fetchAddress: AddressController.fetchAddress,
+  addAddress: AddressController.addAddress,
 };
