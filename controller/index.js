@@ -66,4 +66,5 @@ module.exports = {
   //address
   fetchAddress: AddressController.fetchAddress,
   addAddress: AddressController.addAddress,
+  makeDefaultAddress: AddressController.makeDefaultAddress,
 };

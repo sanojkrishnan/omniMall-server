@@ -67,6 +67,11 @@ const addressSchema = new mongoose.Schema(
   },
 );
 
+addressSchema.index(
+  { userId: 1 },
+  { unique: true, partialFilterExpression: { isDefault: true } },
+);
+
 addressSchema.methods.getPublicProfile = function () {
   const addressObject = this.toObject();
   delete addressObject.userId;
