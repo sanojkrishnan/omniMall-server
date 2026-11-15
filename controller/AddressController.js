@@ -63,6 +63,61 @@ class AddressController extends BaseController {
       200,
     );
   });
+
+  static deleteAddress = BaseController.asyncHandler(async (req, res) => {
+    const { addressId } = req.params;
+
+    const userId = req.user.id;
+    const validatedAddress = BaseController.validateRequest(validateId, {
+      id: addressId,
+    });
+    const validatedId = BaseController.validateRequest(validateId, {
+      id: userId,
+    });
+    const result = await AddressService.deleteAddress(
+      validatedAddress.id,
+      validatedId.id,
+    );
+    BaseController.logAction("ADDRESS_DELETED", result);
+
+    BaseController.sendSuccess(
+      res,
+      "Address deleted successfully",
+      result,
+      200,
+    );
+  });
+
+  static updateAddress = BaseController.asyncHandler(async (req, res) => {
+    const address = req.body;
+    const { addressId } = req.params;
+    const userId = req.user.id;
+
+    const validatedAddress = BaseController.validateRequest(validateId, {
+      id: addressId,
+    });
+    const validatedId = BaseController.validateRequest(validateId, {
+      id: userId,
+    });
+
+    const validatedData = BaseController.validateRequest(
+      addressValidation,
+      address,
+    );
+    const result = await AddressService.updateAddress(
+      validatedAddress.id,
+      validatedId.id,
+      validatedData,
+    );
+    BaseController.logAction("ADDRESS_UPDATED", result);
+    0;
+    BaseController.sendSuccess(
+      res,
+      "Address updated successfully",
+      result,
+      200,
+    );
+  });
 }
 
 module.exports = AddressController;

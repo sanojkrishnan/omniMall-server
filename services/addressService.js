@@ -88,6 +88,58 @@ class AddressService {
       throw error;
     }
   }
+
+  static async deleteAddress(addressId, userId) {
+    try {
+      const existing = await Address.findOne({ _id: addressId, userId });
+
+      if (!existing) {
+        throw new NotFoundError("The address does not exist");
+      }
+
+      if (existing.isDefault) {
+        throw new ConflictError(
+          "Default address cannot be deleted, change the default address to another one",
+        );
+      }
+
+      // delete exactly this document, and only if it still isn't the default
+      const result = await Address.deleteOne({
+        _id: addressId,
+        userId,
+        isDefault: false,
+      });
+
+      logger.info("Address deleted:", result);
+      return result;
+    } catch (error) {
+      logger.error("Address deleting error:", error);
+      throw error;
+    }
+  }
+
+  static async updateAddress(addressId, userId, addressData) {
+    try {
+      // only these fields can be edited; label and isDefault are never touched here
+      const { name, phone, line1, line2, city, state, pincode } = addressData;
+
+      const updated = await Address.findOneAndUpdate(
+        { _id: addressId, userId }, // the user can only edit their own address
+        { $set: { name, phone, line1, line2, city, state, pincode } },
+        { new: true, runValidators: true },
+      );
+
+      if (!updated) {
+        throw new NotFoundError("The address does not exist");
+      }
+
+      logger.info("Address updated:", updated._id);
+      return updated;
+    } catch (error) {
+      logger.error("Address updating error:", error);
+      throw error;
+    }
+  }
 }
 
 module.exports = AddressService;
