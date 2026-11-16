@@ -1,6 +1,6 @@
 // routes/userRoutes.js
 const { upload } = require("../config/cloudinary");
-const { uploadProfileImage, deleteProfileImage } = require("../controllers");
+const { uploadProfileImage, deleteProfileImage } = require("../controller");
 const { protect } = require("../middleware/auth"); // existing auth middleware
 const { adminAuth } = require("../middleware/tockenVerify");
 

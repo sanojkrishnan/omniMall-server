@@ -12,14 +12,11 @@ const sellerRegisterValidation = Joi.object({
   businessEmail: commonPatterns.email.messages(customMessages),
   description: commonPatterns.description.messages(customMessages),
   businessPhone: commonPatterns.phone.messages(customMessages),
+  businessLogo: commonPatterns.imageRequired.messages(customMessages),
   businessAddress: commonPatterns.address.messages(customMessages),
   pickupLocation: commonPatterns.address.messages(customMessages),
   productCategories:
     commonPatterns.requiredUniqueObjectIds.messages(customMessages),
-  businessLogo: commonPatterns.imageRequired.messages({
-    ...customMessages,
-    "any.required": "Business logo is required",
-  }),
   conditionCheck: commonPatterns.terms.messages({
     ...customMessages,
     "any.only": "You must agree to the terms and conditions",
@@ -27,7 +24,25 @@ const sellerRegisterValidation = Joi.object({
   }),
 });
 
+// Same rules as register, but every field optional and no terms.
+const sellerUpdateValidation = sellerRegisterValidation
+  .fork(
+    [
+      "storeName",
+      "businessEmail",
+      "description",
+      "businessPhone",
+      "businessLogo",
+      "businessAddress",
+      "pickupLocation",
+      "productCategories",
+    ],
+    (schema) => schema.optional(),
+  )
+  .fork(["conditionCheck"], (schema) => schema.forbidden());
+
 module.exports = {
   isCallForSeller,
   sellerRegisterValidation,
+  sellerUpdateValidation,
 };

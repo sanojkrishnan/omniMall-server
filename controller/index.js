@@ -62,6 +62,7 @@ module.exports = {
   findProductSeller: SellerController.findProductSeller,
   fetchSingleSeller: SellerController.fetchSingleSeller,
   becomeSeller: SellerController.becomeSeller,
+  updateSeller: SellerController.updateSeller,
 
   //address
   fetchAddress: AddressController.fetchAddress,

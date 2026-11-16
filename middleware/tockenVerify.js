@@ -1,4 +1,8 @@
-const { verifyUserToken, verifyAdminToken } = require("../utils/jwt");
+const {
+  verifyUserToken,
+  verifyAdminToken,
+  verifySellerToken,
+} = require("../utils/jwt");
 
 const getToken = (req) => {
   const authHeader = req.headers.authorization;
@@ -47,5 +51,20 @@ const adminAuth = (req, res, next) => {
     return handleAuthError(err, res);
   }
 };
+// seller verification
+const sellerAuth = (req, res, next) => {
+  try {
+    const token = getToken(req);
 
-module.exports = { userAuth, adminAuth };
+    const decoded = verifySellerToken(token);
+    console.log("DECODED:", decoded);
+
+    req.seller = decoded;
+
+    next();
+  } catch (err) {
+    return handleAuthError(err, res);
+  }
+};
+
+module.exports = { userAuth, adminAuth, sellerAuth };

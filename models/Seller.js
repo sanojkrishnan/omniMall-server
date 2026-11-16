@@ -44,7 +44,7 @@ const sellerSchema = new mongoose.Schema(
       required: [true, "Business phone is required"],
       unique: true,
       trim: true,
-      match: [/^[0-9]{10}$/, "Invalid phone number"], // same rule as the Yup schema
+      match: [/^\+[1-9]\d{7,14}$/, "Invalid phone number"], // same rule as the Yup schema
     },
     businessAddress: {
       type: String,

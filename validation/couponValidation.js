@@ -68,33 +68,34 @@ const couponValidation = Joi.object({
 }).messages(customMessages);
 
 const couponUpdateValidation = updateValidation(
-  couponValidation.fork(
-    [
-      "name",
-      "code",
-      "description",
-      "discountType",
-      "discountValue",
-      "maxDiscount",
-      "minOrderAmount",
-      "startDate",
-      "endDate",
-      "usageLimit",
-      "usagePerUser",
-      "applicableProducts",
-      "applicableCategories",
-      "excludedProducts",
-      "sellerIds",
-      "eligibleUsers",
-      "paymentMethods",
-      "stackable",
-      "autoApply",
-      "createdBy",
-    ],
-    (schema) => schema.optional(),
-  ),
+  couponValidation
+    .fork(
+      [
+        "name",
+        "code",
+        "description",
+        "discountType",
+        "discountValue",
+        "maxDiscount",
+        "minOrderAmount",
+        "startDate",
+        "endDate",
+        "usageLimit",
+        "usagePerUser",
+        "applicableProducts",
+        "applicableCategories",
+        "excludedProducts",
+        "sellerIds",
+        "eligibleUsers",
+        "paymentMethods",
+        "stackable",
+        "autoApply",
+      ],
+      (schema) => schema.optional(),
+    )
+    .fork(["createdBy"], (schema) => schema.forbidden())
+    .prefs({ noDefaults: true }),
 );
-
 module.exports = {
   couponFetchValidation,
   couponUpdateValidation,

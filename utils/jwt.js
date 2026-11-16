@@ -72,12 +72,10 @@ const verifyAdminToken = (token) => {
 
 const verifySellerToken = (token) => {
   try {
-    if (!config.JWT_SECRET.SELLER_SECRET) {
-      throw new Error("JWT_SELLER_SECRET not configured");
-    }
-
     return jwt.verify(token, config.JWT_SECRET.SELLER_SECRET);
   } catch (error) {
+    if (error.name === "TokenExpiredError") throw new Error("Token expired");
+    logger.warn(`Seller token rejected: ${error.message}`);
     throw new Error("Token verification failed");
   }
 };

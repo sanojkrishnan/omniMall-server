@@ -139,6 +139,52 @@ class SellerService {
       throw error;
     }
   }
+
+  static async updateSeller(sellerId, sellerData, file) {
+    const existingSeller = await Seller.findById(sellerId);
+
+    if (!existingSeller) {
+      throw new Error("Seller not found");
+    }
+
+    const toLogo = (file) => ({
+      url: file.path,
+      publicId: file.filename,
+    });
+
+    const updateData = { ...sellerData };
+
+    // Convert uploaded Multer file into Cloudinary logo object
+    if (file) {
+      updateData.businessLogo = toLogo(file);
+    }
+
+    // Update seller document
+    const updatedSeller = await Seller.findByIdAndUpdate(
+      sellerId,
+      { $set: updateData },
+      {
+        runValidators: true,
+        returnDocument: "after",
+      },
+    );
+
+    // Delete old logo only after successful database update
+    if (
+      file &&
+      existingSeller.businessLogo?.publicId &&
+      existingSeller.businessLogo.publicId !==
+        updatedSeller.businessLogo?.publicId
+    ) {
+      try {
+        await safeDestroy(existingSeller.businessLogo.publicId);
+      } catch (error) {
+        console.error("Old seller logo deletion failed:", error);
+      }
+    }
+
+    return updatedSeller;
+  }
 }
 
 module.exports = SellerService;

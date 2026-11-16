@@ -38,10 +38,7 @@ const updateProfileValidation = Joi.object({
   lastName: commonPatterns.lastName.optional().messages(customMessages),
   dateOfBirth: commonPatterns.dateOfBirth.optional().messages(customMessages),
   gender: commonPatterns.gender.optional().messages(customMessages),
-  email: commonPatterns.email.optional().messages(customMessages),
-})
-  .min(1)
-  .messages(customMessages);
+});
 
 module.exports = {
   strongPasswordValidation,
