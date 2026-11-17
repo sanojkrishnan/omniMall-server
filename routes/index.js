@@ -9,6 +9,7 @@ const categoryRoutes = require("./category"); //path for categories
 const cartRoutes = require("./cart"); //path for cart
 const couponRoutes = require("./coupon"); //coupon
 const addressRoutes = require("./address"); //address
+const orderRoutes = require("./order"); //order
 
 const setupRoutes = (app) => {
   //main protected routes
@@ -54,6 +55,11 @@ const setupRoutes = (app) => {
     "/api/address",
     ...(shouldUseAuthLimiter ? [authLimiter] : []),
     addressRoutes,
+  );
+  app.use(
+    "/api/orders",
+    ...(shouldUseAuthLimiter ? [authLimiter] : []),
+    orderRoutes,
   );
 };
 
