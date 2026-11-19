@@ -14,6 +14,7 @@ module.exports = {
   ...require("./productValidation"),
   ...require("./sellerValidation"),
   ...require("./addressValidation"),
+  ...require("./orderValidation"),
 
   // Shared validate() so every route uses identical options + messages
   validate: (schema, data) => {

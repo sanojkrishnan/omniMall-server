@@ -7,4 +7,5 @@ module.exports = {
   AdminService: require("./adminService"),
   SellerService: require("./sellerService"),
   AddressService: require("./addressService"),
+  OrderService: require("./orderService"),
 };

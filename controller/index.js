@@ -8,6 +8,7 @@ const CouponController = require("./CouponController");
 const ProductController = require("./ProductController");
 const SellerController = require("./SellerController");
 const AddressController = require("./AddressController");
+const OrderController = require("./OrderController");
 
 module.exports = {
   register: AuthController.register,
@@ -70,4 +71,7 @@ module.exports = {
   deleteAddress: AddressController.deleteAddress,
   makeDefaultAddress: AddressController.makeDefaultAddress,
   updateAddress: AddressController.updateAddress,
+
+  //orders
+  createOrder: OrderController.createOrder,
 };
