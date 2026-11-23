@@ -1,13 +1,14 @@
 const { OrderService } = require("../services");
-const { validateId } = require("../validation");
+const { validateId, placeOrderSchema } = require("../validation");
 const BaseController = require("./BaseController");
 
 class OrderController extends BaseController {
   static createOrder = BaseController.asyncHandler(async (req, res) => {
     const order = req.body;
+    console.log("VALUES FROM THE CONTROLLER:", req.body);
     const userId = req.user.id;
     const validatedData = BaseController.validateRequest(
-      orderValidation,
+      placeOrderSchema,
       order,
     );
     const validatedId = BaseController.validateRequest(validateId, {

@@ -1,71 +1,132 @@
+// models/Order.js
 const mongoose = require("mongoose");
+
+const PAYMENT_METHODS = ["card", "upi", "wallet", "netBanking", "cod"];
+const ORDER_STATUS = [
+  "pending",
+  "confirmed",
+  "shipped",
+  "delivered",
+  "cancelled",
+];
+const PAYMENT_STATUS = ["pending", "paid", "failed", "refunded"];
+
+const orderItemSchema = new mongoose.Schema(
+  {
+    productId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Product",
+      required: [true, "Product is required"],
+    },
+    quantity: {
+      type: Number,
+      required: [true, "Quantity is required"],
+      min: [1, "Minimum quantity is 1"],
+      max: [10, "Maximum quantity is 10"],
+      validate: {
+        validator: Number.isInteger,
+        message: "Quantity must be a whole number",
+      },
+    },
+    variant: {
+      size: { type: String, trim: true },
+      color: { type: String, trim: true },
+    },
+    // snapshots taken by the server at order time (never trust the client)
+    name: { type: String, trim: true },
+    image: { type: String },
+    mrp: { type: Number, min: 0 },
+    price: { type: Number, min: 0 }, // offer price per unit
+  },
+  { _id: false },
+);
 
 const orderSchema = new mongoose.Schema(
   {
-    label: {
-      type: String,
-      enum: ["home", "work", "other"],
-      required: [true, "Give a label"],
-    },
-
-    name: {
-      type: String,
-      trim: true,
-      required: [true, "Enter the full name"],
-    },
-
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: [true, "User is required"],
     },
 
-    phone: {
-      type: String,
-      trim: true,
-      required: [true, "Phone number is required"],
-      match: /^\+?[\d\s-]{10,15}$/,
+    items: {
+      type: [orderItemSchema],
+      validate: {
+        validator: (v) => Array.isArray(v) && v.length >= 1,
+        message: "Your cart is empty",
+      },
     },
 
-    line1: {
-      type: String,
-      trim: true,
-      required: [true, "This is a part of your address"],
+    // addressId from the form
+    addressId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Address",
+      required: [true, "Select a delivery address"],
     },
 
-    line2: {
+    // snapshot of the address, so later edits don't change old orders
+    shippingAddress: {
+      label: String,
+      name: String,
+      phone: String,
+      line1: String,
+      line2: String,
+      city: String,
+      state: String,
+      pincode: String,
+    },
+
+    paymentMethod: {
+      type: String,
+      enum: {
+        values: PAYMENT_METHODS,
+        message: "Select a payment method",
+      },
+      required: [true, "Select a payment method"],
+    },
+
+    paymentStatus: {
+      type: String,
+      enum: PAYMENT_STATUS,
+      default: "pending",
+    },
+
+    couponCode: {
       type: String,
       trim: true,
+      uppercase: true,
+      minlength: [3, "Minimum 3 letter is needed"],
+      maxlength: [6, "maximum 6 letter is allowed"],
+      default: null,
+      set: (v) => (v === "" ? null : v),
+    },
+
+    notes: {
+      type: String,
+      trim: true,
+      maxlength: [300, "Maximum 300 characters"],
       default: "",
     },
 
-    city: {
-      type: String,
-      trim: true,
-      required: [true, "This is a part of your address"],
-    },
+    // calculated by the server
+    mrpTotal: { type: Number, min: 0, default: 0 },
+    productDiscount: { type: Number, min: 0, default: 0 },
+    couponDiscount: { type: Number, min: 0, default: 0 },
+    deliveryFee: { type: Number, min: 0, default: 0 },
+    codFee: { type: Number, min: 0, default: 0 },
+    gstIncluded: { type: Number, min: 0, default: 0 },
+    total: { type: Number, min: 0, default: 0 },
 
-    state: {
+    status: {
       type: String,
-      trim: true,
-      required: [true, "This is a part of your address"],
-    },
-
-    pincode: {
-      type: String,
-      required: [true, "Pin code is required"],
-      match: [/^\d{6}$/, "Pin code must be 6 digits"],
-    },
-
-    isDefault: {
-      type: Boolean,
-      default: false,
+      enum: ORDER_STATUS,
+      default: "pending",
     },
   },
-  {
-    timestamps: true,
-  },
+  { timestamps: true },
 );
+
+orderSchema.index({ userId: 1, createdAt: -1 });
 
 orderSchema.methods.getPublicProfile = function () {
   const orderObject = this.toObject();
