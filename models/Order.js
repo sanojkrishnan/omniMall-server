@@ -1,4 +1,3 @@
-// models/Order.js
 const mongoose = require("mongoose");
 
 const PAYMENT_METHODS = ["card", "upi", "wallet", "netBanking", "cod"];
