@@ -47,6 +47,12 @@ const orderSchema = new mongoose.Schema(
       ref: "User",
       required: [true, "User is required"],
     },
+    orderId: {
+      type: String,
+      required: [true, "orderId is required"],
+      unique: true,
+      match: /^OM_[A-Z]{4}\d{23}$/,
+    },
 
     items: {
       type: [orderItemSchema],
@@ -126,6 +132,30 @@ const orderSchema = new mongoose.Schema(
 );
 
 orderSchema.index({ userId: 1, createdAt: -1 });
+
+// units of each product in this user's unfinished orders
+orderSchema.statics.getActiveUnitsByProduct = async function (
+  userId,
+  productIds,
+) {
+  const userObjectId = new mongoose.Types.ObjectId(userId);
+  const objectIds = productIds.map((id) => new mongoose.Types.ObjectId(id));
+
+  const rows = await this.aggregate([
+    {
+      $match: {
+        userId: userObjectId,
+        status: { $nin: ["delivered", "cancelled"] },
+        "items.productId": { $in: objectIds },
+      },
+    },
+    { $unwind: "$items" },
+    { $match: { "items.productId": { $in: objectIds } } },
+    { $group: { _id: "$items.productId", units: { $sum: "$items.quantity" } } },
+  ]);
+
+  return new Map(rows.map((r) => [String(r._id), r.units]));
+};
 
 orderSchema.methods.getPublicProfile = function () {
   const orderObject = this.toObject();
