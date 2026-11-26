@@ -37,14 +37,10 @@ class CategoryService {
   //fetch single category with _id
   static async fetchOneCategory(categoryId) {
     try {
-      if (!categoryId) {
-        throw new Error("Category ID is required");
-      }
-
       const category = await Category.findById(categoryId);
 
       if (!category) {
-        throw new Error("Category not found");
+        throw new NotFoundError("Category not found");
       }
 
       logger.info("Category send:", category);

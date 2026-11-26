@@ -189,6 +189,22 @@ class OrderService {
       throw error;
     }
   }
+
+  static async fetchSingleOrder(userId, orderId) {
+    try {
+      const singleOrder = await Order.find({ userId, orderId });
+
+      if (!singleOrder) {
+        throw new NotFoundError("Order not found");
+      }
+
+      logger.info("Order send:", singleOrder);
+      return singleOrder;
+    } catch (error) {
+      logger.error("Fetch single order error:", error);
+      throw error;
+    }
+  }
 }
 
 module.exports = OrderService;
