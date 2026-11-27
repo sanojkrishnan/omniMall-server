@@ -29,6 +29,7 @@
     "node-cron": "^4.6.0",
     "nodemailer": "^10.5.0",
     "nodemon": "^3.1.11",
+    "pdfkit": "^0.21.0",
     "razorpay": "^2.9.8",
     "sharp": "^0.35.5",
     "socket.io": "^4.8.3",

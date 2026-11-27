@@ -2,6 +2,7 @@ const Address = require("../models/Address");
 const Order = require("../models/Order");
 const Product = require("../models/Product");
 const { NotFoundError, ValidationError } = require("../utils/errors");
+const generateInvoice = require("../utils/generateInvoice");
 const logger = require("../utils/logger");
 
 const MAX_QTY_PER_PRODUCT = 10;
@@ -11,26 +12,6 @@ const COD_FEE = 25;
 const GST_RATE = 18; // percent, treated as already included in the price
 
 const OBJECT_ID_REGEX = /^[a-f\d]{24}$/i;
-
-// OM_ + country(2) + state(2) + pin(4) + YYMMDD(6) + timestamp(13)
-function generateOrderId(country, state, pincode) {
-  const date = new Date();
-  const year = String(date.getFullYear()).slice(-2);
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  const time = String(date.getTime());
-
-  const letters = (str) =>
-    String(str)
-      .replace(/[^a-zA-Z]/g, "")
-      .slice(0, 2)
-      .toUpperCase()
-      .padEnd(2, "X");
-
-  const pin = String(pincode).slice(-4);
-
-  return `OM_${letters(country)}${letters(state)}${pin}${year}${month}${day}${time}`;
-}
 
 class OrderService {
   static async addOrder(orderData, userId) {
@@ -192,7 +173,7 @@ class OrderService {
 
   static async fetchSingleOrder(userId, orderId) {
     try {
-      const singleOrder = await Order.find({ userId, orderId });
+      const singleOrder = await Order.findOne({ userId, orderId });
 
       if (!singleOrder) {
         throw new NotFoundError("Order not found");
@@ -200,6 +181,23 @@ class OrderService {
 
       logger.info("Order send:", singleOrder);
       return singleOrder;
+    } catch (error) {
+      logger.error("Fetch single order error:", error);
+      throw error;
+    }
+  }
+
+  static async createInvoice(userId, orderId) {
+    try {
+      const order = await Order.findOne({ userId, orderId })
+        .populate("userId", "name email")
+        .lean();
+
+      if (!order) {
+        throw new NotFoundError("Order not found");
+      }
+
+      return order;
     } catch (error) {
       logger.error("Fetch single order error:", error);
       throw error;

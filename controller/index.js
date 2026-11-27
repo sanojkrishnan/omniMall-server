@@ -75,4 +75,5 @@ module.exports = {
   //orders
   createOrder: OrderController.createOrder,
   findSingleOrder: OrderController.findSingleOrder,
+  createInvoice: OrderController.createInvoice,
 };
